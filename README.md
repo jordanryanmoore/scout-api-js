@@ -1,2 +1,2 @@
-# scout-api-js
-A JavaScript library for the Scout security system API.
+# scout-api
+An unofficial JavaScript library for the Scout security system API.

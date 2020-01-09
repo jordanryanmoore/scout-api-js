@@ -1,0 +1,43 @@
+{
+  "name": "scout-api",
+  "version": "0.0.0",
+  "description": "An unofficial JavaScript library for the Scout security system API.",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib/**/*"
+  ],
+  "scripts": {
+    "test": "jest",
+    "build": "tsc && npm run lint",
+    "lint": "tslint -p tsconfig.json",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jordanryanmoore/scout-api-js.git"
+  },
+  "author": "Jordan Ryan Moore",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jordanryanmoore/scout-api-js/issues"
+  },
+  "homepage": "https://github.com/jordanryanmoore/scout-api-js#readme",
+  "devDependencies": {
+    "@types/jest": "^24.0.25",
+    "@types/jsonwebtoken": "^8.3.5",
+    "@types/request": "^2.48.4",
+    "@types/request-promise-native": "^1.0.17",
+    "jest": "^24.9.0",
+    "prettier": "^1.19.1",
+    "ts-jest": "^24.3.0",
+    "tslint": "^5.20.1",
+    "typescript": "^3.7.4"
+  },
+  "dependencies": {
+    "jsonwebtoken": "^8.5.1",
+    "request": "^2.88.0",
+    "request-promise-native": "^1.0.8"
+  }
+}
