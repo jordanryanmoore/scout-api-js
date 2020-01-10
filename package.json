@@ -9,10 +9,10 @@
   ],
   "scripts": {
     "test": "jest",
-    "build": "tsc && npm run lint",
+    "compile": "tsc",
+    "build": "npm test && npm run lint && npm run compile",
     "lint": "tslint -p tsconfig.json",
-    "prepare": "npm run build",
-    "prepublishOnly": "npm test && npm run lint"
+    "prepare": "npm run build"
   },
   "repository": {
     "type": "git",
