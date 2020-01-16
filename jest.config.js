@@ -1,12 +1,16 @@
 module.exports = {
-    "roots": [
+    roots: [
         "<rootDir>/tst",
     ],
-    "testMatch": [
+    testMatch: [
         "**/?(*.)+(spec|test).+(ts|tsx|js)",
     ],
-    "transform": {
+    transform: {
       "^.+\\.(ts|tsx)$": "ts-jest",
     },
-    "collectCoverage": true,
+    collectCoverage: true,
+    coveragePathIgnorePatterns: [
+        "/node_modules/",
+        "/generated-src/",
+    ],
 };

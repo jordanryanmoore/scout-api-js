@@ -6,6 +6,6 @@
     "outDir": "./lib",
     "strict": true
   },
-  "include": ["src"],
+  "include": ["src", "generated-src"],
   "exclude": ["node_modules", "tst"]
 }
