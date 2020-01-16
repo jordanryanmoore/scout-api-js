@@ -2,15 +2,18 @@
   "name": "scout-api",
   "version": "0.0.0",
   "description": "An unofficial JavaScript library for the Scout security system API.",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "main": "lib/src/index.js",
+  "types": "lib/src/index.d.ts",
   "files": [
     "lib/**/*"
   ],
   "scripts": {
+    "clean": "rm -rf generated-src/** lib/**",
+    "generate": "openapi-generator generate -i openapi.yml -g typescript-axios -o generated-src/",
     "test": "jest",
     "compile": "tsc",
     "build": "npm test && npm run lint && npm run compile",
+    "release": "npm run clean && npm run generate && npm run build",
     "lint": "eslint src/**/*.ts",
     "prepare": "npm run release"
   },
@@ -25,10 +28,10 @@
   },
   "homepage": "https://github.com/jordanryanmoore/scout-api-js#readme",
   "devDependencies": {
+    "@openapitools/openapi-generator-cli": "^1.0.8-4.2.2",
+    "@types/axios": "^0.14.0",
     "@types/jest": "^24.0.25",
     "@types/jsonwebtoken": "^8.3.5",
-    "@types/request": "^2.48.4",
-    "@types/request-promise-native": "^1.0.17",
     "@typescript-eslint/eslint-plugin": "^2.15.0",
     "@typescript-eslint/parser": "^2.15.0",
     "acorn": "^7.1.0",
@@ -39,8 +42,7 @@
     "typescript": "^3.7.4"
   },
   "dependencies": {
-    "jsonwebtoken": "^8.5.1",
-    "request": "^2.88.0",
-    "request-promise-native": "^1.0.8"
+    "axios": "^0.19.1",
+    "jsonwebtoken": "^8.5.1"
   }
 }

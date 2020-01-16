@@ -1,0 +1,605 @@
+openapi: 3.0.2
+
+info:
+  title: Scout API
+  description: This is an unofficial API spec for Scout.
+  contact:
+    url: http://github.com/jordanryanmoore/scout-api
+  license:
+    name: MIT
+    url: http://github.com/jordanryanmoore/scout-api/LICENSE.md
+  version: 0.0.0
+
+servers:
+  - url: https://api.scoutalarm.com
+
+components:
+  parameters:
+    InstallCode:
+      name: install_code
+      in: path
+      required: true
+      schema:
+        type: string
+
+    LocationId:
+      name: location_id
+      in: path
+      required: true
+      schema:
+        type: string
+
+    MemberId:
+      name: member_id
+      in: path
+      required: true
+      schema:
+        type: string
+
+    SerialNumber:
+      name: serial_number
+      in: path
+      required: true
+      schema:
+        type: string
+
+  schemas:
+    CheckInstallCodeResponse:
+      required:
+        - valid
+      properties:
+        valid:
+          type: boolean
+
+    CheckSerialNumberResponse:
+      required:
+        - valid
+      properties:
+        valid:
+          type: boolean
+
+    ContactState:
+      type: string
+      enum:
+        - open
+        - close
+
+    Device:
+      required:
+        - id
+        - name
+        - type
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        reported:
+          type: object
+          required:
+            - fw_version
+            - timedout
+          properties:
+            battery:
+              type: object
+              required:
+                - at
+              properties:
+                at:
+                  type: string
+                  format: date-time
+                low:
+                  type: string
+                  format: date-time
+            fw_version:
+              type: string
+            humidity:
+              type: object
+              required:
+                - at
+                - percent
+              properties:
+                at:
+                  type: string
+                  format: date-time
+                percent:
+                  type: number
+            manufacturer:
+              type: string
+            model:
+              type: string
+            temperature:
+              type: object
+              required:
+                - at
+                - degrees
+              properties:
+                at:
+                  type: string
+                  format: date-time
+                degrees:
+                  type: number
+            timedout:
+              type: boolean
+            trigger:
+              type: object
+              required:
+                - at
+              properties:
+                at:
+                  type: string
+                  format: date-time
+                state:
+                  oneOf: # This might necessitate some refactoring…
+                    - $ref: '#/components/schemas/ContactState'
+                    - $ref: '#/components/schemas/MotionState'
+                    - $ref: '#/components/schemas/SmokeState'
+                    - $ref: '#/components/schemas/WaterState'
+                tamper:
+                  type: boolean
+        type:
+          $ref: '#/components/schemas/DeviceType'
+
+    DeviceType:
+      type: string
+      enum: 
+        - access_sensor
+        - door_panel
+        - glass_break
+        - motion_sensor
+        - smoke_alarm
+        - water_sensor
+
+    ForgotPasswordRequest:
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+
+    ForgotPasswordResponse:
+      required:
+        - sent
+      properties:
+        sent:
+          type: boolean
+
+    GetDevicesResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/Device'
+
+    GetLocationsResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/Location'
+
+    GetModesResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/Mode'
+
+    Hub:
+      required:
+        - id
+        - serial_number
+        - type
+      properties:
+        id:
+          type: string
+        reported:
+          type: object
+          required:
+            - battery
+            - fw_version
+            - status
+          properties:
+            battery:
+              type: object
+              required:
+                - active
+                - at
+                - level
+              properties:
+                active:
+                  type: boolean
+                at:
+                  type: string
+                  format: date-time
+                level:
+                  type: number
+                low:
+                  type: string
+                  format: date-time
+            fw_version:
+              type: string
+            hw_version:
+              type: string
+            status: # enum of active, …?
+              type: string
+            temperature:
+              type: integer
+        serial_number:
+          type: string
+        type: # enum of scout1, scout1S, …?
+          type: string
+
+    Location:
+      required:
+        - id
+        - name
+        - admin_ids
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        admin_ids:
+          type: array
+          items:
+            type: string
+
+    LoginRequest:
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+
+    LoginResponse:
+      required:
+        - jwt
+      properties:
+        jwt:
+          type: string
+
+    Mode:
+      required:
+        - id
+        - name
+        - state
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        state:
+          $ref: '#/components/schemas/ModeState'
+
+    ModeState:
+      type: string
+      enum:
+        - disarmed
+        - arming
+        - armed
+        - triggered
+        - alarmed
+
+    MotionState:
+      type: string
+      enum:
+        - motion_start
+        - motion_stop
+
+    ResetPasswordRequest:
+      required:
+        - token
+        - new_password
+        - new_password_confirmation
+      properties:
+        token:
+          type: string
+        new_password:
+          type: string
+          format: password
+        new_password_confirmation:
+          type: string
+          format: password
+
+    ResetPasswordResponse:
+      required:
+        - jwt
+      properties:
+        jwt:
+          type: string
+
+    SignupRequest:
+      required:
+        - email
+        - fname
+        - lname
+        - phone_number
+        - password
+        - password_confirmation
+      properties:
+        email:
+          type: string
+          format: email
+        fname:
+          type: string
+        lname:
+          type: string
+        phone_number:
+          type: string
+        password:
+          type: string
+          format: password
+        password_confirmation:
+          type: string
+          format: password
+
+    SignupResponse:
+      required:
+        - jwt
+      properties:
+        jwt:
+          type: string
+
+    SmokeState:
+      required:
+        - smoke
+      properties:
+        smoke:
+          type: string
+          # enum: ok, …?
+
+    UpdatePasswordRequest:
+      required:
+        - password
+        - new_password
+        - new_password_confirmation
+      properties:
+        password:
+          type: string
+          format: password
+        new_password:
+          type: string
+          format: password
+        new_password_confirmation:
+          type: string
+          format: password
+
+    UpdatePasswordResponse:
+      required:
+        - jwt
+      properties:
+        jwt:
+          type: string
+
+    UpdateEmailRequest:
+      required:
+        - password
+        - new_email
+      properties:
+        password:
+          type: string
+          format: password
+        new_email:
+          type: string
+          format: email
+
+    UpdateEmailResponse:
+      required:
+        - jwt
+      properties:
+        jwt:
+          type: string
+
+    WaterState:
+      type: string
+      enum:
+        - dry
+        - wet
+
+  securitySchemes:
+    jwt:
+      type: apiKey
+      name: Authorization
+      in: header
+
+paths:
+  /auth:
+    post:
+      tags: [auth]
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        200:
+          description: A new JWT for the member.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+
+    put:
+      tags: [auth]
+      operationId: forgotPassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequest'
+      responses:
+        200:
+          description: If the email was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForgotPasswordResponse'
+
+  /auth/email:
+    put:
+      tags: [general]
+      operationId: updateEmail
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEmailRequest'
+      responses:
+        200:
+          description: A new JWT for the member.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateEmailResponse'
+      security:
+        - jwt: []
+
+  /auth/password:
+    post:
+      tags: [auth]
+      operationId: resetPassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+      responses:
+        200:
+          description: A new JWT for the member.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResetPasswordResponse'
+
+    put:
+      tags: [general]
+      operationId: updatePassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePasswordRequest'
+      responses:
+        200:
+          description: A new JWT for the member.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdatePasswordResponse'
+      security:
+        - jwt: []
+
+  /auth/signup:
+    post:
+      tags: [auth]
+      operationId: signup
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignupRequest'
+      responses:
+        200:
+          description: A new JWT for the member.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignupResponse'
+
+  /hubs/install_code/{install_code}:
+    parameters:
+      - $ref: '#/components/parameters/InstallCode'
+    get:
+      tags: [auth]
+      operationId: checkInstallCode
+      responses:
+        200:
+          description: If the install code is valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckInstallCodeResponse'
+
+  /hubs/serial_number/{serial_number}:
+    parameters:
+      - $ref: '#/components/parameters/SerialNumber'
+    get:
+      tags: [auth]
+      operationId: checkSerialNumber
+      responses:
+        200:
+          description: If the serial number is valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckSerialNumberResponse'
+
+  /locations/{location_id}/devices:
+    parameters:
+      - $ref: '#/components/parameters/LocationId'
+    get:
+      tags: [general]
+      operationId: getDevices
+      responses:
+        200:
+          description: A list of the location's devices.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetDevicesResponse'
+      security:
+        - jwt: []
+
+  /locations/{location_id}/hub:
+    parameters:
+      - $ref: '#/components/parameters/LocationId'
+    get:
+      tags: [general]
+      operationId: getHub
+      responses:
+        200:
+          description: The location's hub.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Hub'
+      security:
+        - jwt: []
+
+  /locations/{location_id}/modes:
+    parameters:
+      - $ref: '#/components/parameters/LocationId'
+    get:
+      tags: [general]
+      operationId: getModes
+      responses:
+        200:
+          description: A list of the location's modes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetModesResponse'
+      security:
+        - jwt: []
+
+  /members/{member_id}/locations:
+    parameters:
+      - $ref: '#/components/parameters/MemberId'
+    get:
+      tags: [general]
+      operationId: getLocations
+      responses:
+        200:
+          description: A list of the member's locations.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetLocationsResponse'
+      security:
+        - jwt: []
+
+tags:
+  - name: general
+  - name: auth
