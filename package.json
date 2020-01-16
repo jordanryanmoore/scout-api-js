@@ -15,7 +15,7 @@
     "build": "npm test && npm run lint && npm run compile",
     "release": "npm run clean && npm run generate && npm run build",
     "lint": "eslint src/**/*.ts",
-    "prepare": "npm run build"
+    "prepare": "npm run release"
   },
   "repository": {
     "type": "git",
