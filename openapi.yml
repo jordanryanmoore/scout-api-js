@@ -15,6 +15,13 @@ servers:
 
 components:
   parameters:
+    HubId:
+      name: hub_id
+      in: path
+      required: true
+      schema:
+        type: string
+
     InstallCode:
       name: install_code
       in: path
@@ -36,6 +43,13 @@ components:
       schema:
         type: string
 
+    ModeId:
+      name: mode_id
+      in: path
+      required: true
+      schema:
+        type: string
+
     SerialNumber:
       name: serial_number
       in: path
@@ -44,6 +58,29 @@ components:
         type: string
 
   schemas:
+    AmazonAccount:
+      properties:
+        modes:
+          properties:
+            away:
+              type: string
+            home:
+              type: string
+            sleep:
+              type: string
+        expires_at:
+          type: string
+          format: date-time
+        pin:
+          type: string
+          format: password
+        scope:
+          type: array
+          items:
+            type: string
+        token:
+          type: boolean
+  
     CheckInstallCodeResponse:
       required:
         - valid
@@ -66,13 +103,48 @@ components:
 
     Device:
       required:
+        - created
+        - desired
+        - heartbeat
+        - hub_id
         - id
+        - location_id
+        - mode_ids
         - name
         - type
       properties:
+        created:
+          type: string
+          format: date-time
+        desired:
+          properties:
+            chirp:
+              required:
+                - enabled
+              properties:
+                enabled:
+                  type: boolean
+            chirps:
+              required:
+                - hub
+              properties:
+                hub:
+                  type: boolean
+        heartbeat:
+          type: integer
+        hub_id:
+          type: string
         id:
           type: string
+        location_id:
+          type: string
+        mode_ids:
+          type: array
+          items:
+            type: string
         name:
+          type: string
+        pro_monitoring_label:
           type: string
         reported:
           type: object
@@ -137,12 +209,28 @@ components:
                     - $ref: '#/components/schemas/WaterState'
                 tamper:
                   type: boolean
+            # zigbee: {}
         type:
           $ref: '#/components/schemas/DeviceType'
+        updated:
+          type: string
+          format: date-time
+
+    DeviceGroup:
+      required:
+        - name
+        - device_ids
+      properties:
+        name:
+          type: string
+        device_ids:
+          type: array
+          items:
+            type: string
 
     DeviceType:
       type: string
-      enum: 
+      enum:
         - access_sensor
         - door_panel
         - glass_break
@@ -165,35 +253,58 @@ components:
         sent:
           type: boolean
 
-    GetDevicesResponse:
-      type: array
-      items:
-        $ref: '#/components/schemas/Device'
-
-    GetLocationsResponse:
-      type: array
-      items:
-        $ref: '#/components/schemas/Location'
-
-    GetModesResponse:
-      type: array
-      items:
-        $ref: '#/components/schemas/Mode'
-
     Hub:
       required:
+        - created
+        - desired
+        - heartbeat
         - id
+        - install_code
+        - location_id
         - serial_number
         - type
+        - version
       properties:
+        created:
+          type: string
+          format: date-time
+        desired:
+          required:
+            - chirps
+          properties:
+            chirp:
+              type: string
+              enum:
+                - single
+                # - ?
+            chirps:
+              required:
+                - arming
+              properties:
+                arming:
+                  type: boolean
+        heartbeat:
+          type: integer
         id:
           type: string
+        install_code:
+          type: string
+        location_id:
+          type: string
         reported:
-          type: object
           required:
             - battery
+            # - cellular
+            # - connection
             - fw_version
+            # - led
+            # - logging
+            # - mac_address
+            # - siren
             - status
+            # - wifi
+            # - zigbee
+            # - zwave
           properties:
             battery:
               type: object
@@ -201,6 +312,7 @@ components:
                 - active
                 - at
                 - level
+                # - temperature
               properties:
                 active:
                   type: boolean
@@ -212,33 +324,256 @@ components:
                 low:
                   type: string
                   format: date-time
+                temperature:
+                  type: integer
+            # cellular: {}
+            # connection: {}
             fw_version:
               type: string
             hw_version:
               type: string
-            status: # enum of active, …?
+            led:
               type: string
+              enum:
+                - green
+                # - ?
+            logging:
+              type: boolean
+            mac_address:
+              type: string
+            siren:
+              type: boolean
+            status:
+              type: string
+              enum:
+                - active
+                # - ?
             temperature:
               type: integer
+            wifi:
+              required:
+                - active
+                - at
+              properties:
+                active:
+                  type: boolean
+                at:
+                  type: string
+                  format: date-time
+            # zigbee: {}
+            # zwave: {}
         serial_number:
           type: string
-        type: # enum of scout1, scout1S, …?
+        type:
+          type: string
+          enum:
+            - scout1
+            - scout1S
+        updated:
+          type: string
+          format: date-time
+        version:
           type: string
 
     Location:
       required:
-        - id
-        - name
+        - address
         - admin_ids
+        - created
+        - environmental
+        - id
+        - member_ids
+        - mode_ids
+        - name
+        - plan
+        - pro_monitoring
+        - rfid_ids
+        - state
+        - structure_type
+        - subscription_required
+        - timezone
       properties:
-        id:
-          type: string
-        name:
-          type: string
+        address:
+          required:
+            - addr1
+            - city
+            - country
+            - state
+            - zipcode
+          properties:
+            addr1:
+              type: string
+            addr2:
+              type: string
+            city:
+              type: string
+            country:
+              type: string
+            state:
+              type: string
+            zipcode:
+              type: string
         admin_ids:
           type: array
           items:
             type: string
+        alarm_contacts:
+          required:
+            - email
+            - phone_numbers
+            - sms_numbers
+          properties:
+            phone_numbers:
+              type: array
+              items:
+                type: string
+            sms_numbers:
+              type: array
+              items:
+                type: string
+            email:
+              type: array
+              items:
+                type: string
+        # aliases: {}
+        amazon_user_id:
+          type: string
+        camera_subscription_id:
+          type: string
+        connected_accounts:
+          properties:
+            amazon:
+              $ref: '#/components/schemas/AmazonAccount'
+            ifttt:
+              type: array
+              items:
+                type: string
+        created:
+          type: string
+          format: date-time
+        device_groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceGroup'
+        device_ids:
+          type: array
+          items:
+            type: string
+        environmental:
+          required:
+            - alarmed
+          properties:
+            alarmed:
+              type: array
+              items:
+                type: string
+        hub_id:
+          type: string
+        id:
+          type: string
+        member_ids:
+          type: array
+          items:
+            type: string
+        member_state:
+          $ref: '#/components/schemas/MemberState'
+        mode_ids:
+          type: array
+          items:
+            type: string
+        monitoring_account_number:
+          type: string
+        name:
+          type: string
+        plan:
+          $ref: '#/components/schemas/LocationPlan'
+        pro_monitoring:
+          required:
+            - address1
+            - city
+            - region
+            - structure_type
+            - time_zone
+            - zipcode
+          properties:
+            account_number:
+              type: string
+            address1:
+              type: string
+            address2:
+              type: string
+            alternative_phone:
+              type: string
+            city:
+              type: string
+            county:
+              type: string
+            created:
+              type: string
+              format: date-time
+            cross_street:
+              type: string
+            name:
+              type: string
+            passcodes:
+              type: array
+              items:
+                type: string
+                format: password
+            phone:
+              type: string
+            region:
+              type: string
+            structure_type:
+              type: string
+            time_zone:
+              type: string
+            zipcode:
+              type: string
+        rfid_ids:
+          type: array
+          items:
+            type: string
+        state:
+          type: object
+          required:
+            - install
+            - visible
+          properties:
+            armed:
+              type: string
+            install:
+              type: boolean
+            ready:
+              type: boolean
+            visible:
+              type: boolean
+        structure_type:
+          $ref: '#/components/schemas/LocationStructureType'
+        subscription_id:
+          type: string
+        subscription_required:
+          type: boolean
+        timezone:
+          type: string
+        updated:
+          type: string
+          format: date-time
+
+    LocationStructureType:
+      type: string
+      enum:
+        - A # Apartment or condo
+        - S # Single-family home
+        # - ?
+        # - ?
+
+    LocationPlan:
+      type: string
+      enum:
+        - free
+        - pro
+        # - ?
 
     LoginRequest:
       required:
@@ -252,25 +587,69 @@ components:
           type: string
           format: password
 
-    LoginResponse:
-      required:
-        - jwt
-      properties:
-        jwt:
-          type: string
+    MemberState:
+      type: string
+      enum:
+        - admin
+        - member
 
     Mode:
       required:
+        - actions
+        - created
+        - device_ids
         - id
+        - location_id
         - name
         - state
       properties:
+        actions:
+          required:
+            - camera_record
+            - count_down
+            - email
+            - entry_delay
+            - lights
+            - professional_monitoring
+            - push
+            - siren
+          properties:
+            camera_record:
+              type: boolean
+            count_down:
+              type: boolean
+            email:
+              type: array
+              items:
+                type: string
+            entry_delay:
+              type: integer
+            lights:
+              type: boolean
+            professional_monitoring:
+              type: boolean
+            push:
+              type: boolean
+            siren:
+              type: boolean
+        created:
+          type: string
+          format: date-time
+        device_ids:
+          type: array
+          items:
+            type: string
         id:
+          type: string
+        location_id:
           type: string
         name:
           type: string
         state:
           $ref: '#/components/schemas/ModeState'
+        updated:
+          type: string
+          format: date-time
 
     ModeState:
       type: string
@@ -302,12 +681,22 @@ components:
           type: string
           format: password
 
-    ResetPasswordResponse:
+    Session:
       required:
         - jwt
       properties:
         jwt:
           type: string
+
+    SetChirpRequest:
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          enum:
+            - single
+            # - ?
 
     SignupRequest:
       required:
@@ -334,20 +723,22 @@ components:
           type: string
           format: password
 
-    SignupResponse:
-      required:
-        - jwt
-      properties:
-        jwt:
-          type: string
-
     SmokeState:
       required:
         - smoke
       properties:
         smoke:
           type: string
-          # enum: ok, …?
+          enum:
+            - ok
+            # - ?
+
+    ToggleRecipeRequest:
+      required:
+        - state
+      properties:
+        state:
+          $ref: '#/components/schemas/ModeState'
 
     UpdatePasswordRequest:
       required:
@@ -365,13 +756,6 @@ components:
           type: string
           format: password
 
-    UpdatePasswordResponse:
-      required:
-        - jwt
-      properties:
-        jwt:
-          type: string
-
     UpdateEmailRequest:
       required:
         - password
@@ -383,13 +767,6 @@ components:
         new_email:
           type: string
           format: email
-
-    UpdateEmailResponse:
-      required:
-        - jwt
-      properties:
-        jwt:
-          type: string
 
     WaterState:
       type: string
@@ -415,11 +792,11 @@ paths:
               $ref: '#/components/schemas/LoginRequest'
       responses:
         200:
-          description: A new JWT for the member.
+          description: A new session for the member.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LoginResponse'
+                $ref: '#/components/schemas/Session'
 
     put:
       tags: [auth]
@@ -448,11 +825,11 @@ paths:
               $ref: '#/components/schemas/UpdateEmailRequest'
       responses:
         200:
-          description: A new JWT for the member.
+          description: A new session for the member.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UpdateEmailResponse'
+                $ref: '#/components/schemas/Session'
       security:
         - jwt: []
 
@@ -467,11 +844,11 @@ paths:
               $ref: '#/components/schemas/ResetPasswordRequest'
       responses:
         200:
-          description: A new JWT for the member.
+          description: A new session for the member.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResetPasswordResponse'
+                $ref: '#/components/schemas/Session'
 
     put:
       tags: [general]
@@ -483,11 +860,11 @@ paths:
               $ref: '#/components/schemas/UpdatePasswordRequest'
       responses:
         200:
-          description: A new JWT for the member.
+          description: A new session for the member.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UpdatePasswordResponse'
+                $ref: '#/components/schemas/Session'
       security:
         - jwt: []
 
@@ -502,11 +879,32 @@ paths:
               $ref: '#/components/schemas/SignupRequest'
       responses:
         200:
-          description: A new JWT for the member.
+          description: A new session for the member.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SignupResponse'
+                $ref: '#/components/schemas/Session'
+
+  /hubs/{hub_id}:
+    parameters:
+      - $ref: '#/components/parameters/HubId'
+    put:
+      tags: [general]
+      operationId: setChirp
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetChirpRequest'
+      responses:
+        200:
+          description: The hub.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Hub'
+      security:
+        - jwt: []
 
   /hubs/install_code/{install_code}:
     parameters:
@@ -548,7 +946,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetDevicesResponse'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Device'
       security:
         - jwt: []
 
@@ -580,7 +980,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetModesResponse'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Mode'
       security:
         - jwt: []
 
@@ -596,7 +998,30 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetLocationsResponse'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Location'
+      security:
+        - jwt: []
+
+  /modes/{mode_id}:
+    parameters:
+      - $ref: '#/components/parameters/ModeId'
+    post:
+      tags: [general]
+      operationId: toggleRecipe
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ToggleRecipeRequest'
+      responses:
+        200:
+          description: The updated recipe.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mode'
       security:
         - jwt: []
 
