@@ -86,6 +86,12 @@ components:
         type: string
 
   schemas:
+    AccessSensorState:
+      type: string
+      enum:
+        - open
+        - close
+
     Activity:
       required:
         - description
@@ -110,22 +116,7 @@ components:
             value:
               type: string
         event:
-          type: string
-          enum:
-            - armed
-            - close
-            - created
-            - disarmed
-            - dismissed
-            - dry
-            - open
-            - paired
-            - smoke_ok
-            - smoke_testing
-            # - smoke_?
-            - unpaired
-            - wet
-            # - ?
+          $ref: '#/components/schemas/ActivityEventType'
         id:
           type: string
         item_id:
@@ -136,11 +127,40 @@ components:
           type: string
           format: date-time
         type:
-          type: string
-          enum:
-            - device
-            - location
-            - mode
+          $ref: '#/components/schemas/ActivityType'
+
+    ActivityEventType:
+      type: string
+      enum:
+        - armed
+        - close
+        - co_emergency
+        - co_ok
+        - co_testing
+        - co_warning
+        - created
+        - disarmed
+        - dismissed
+        - dry
+        - open
+        - paired
+        - smoke_emergency
+        - smoke_ok
+        - smoke_testing
+        - smoke_warning
+        - unpaired
+        - wet
+        # - malfunction_emergency?
+        # - malfunction_ok?
+        # - jammed?
+        # - ?
+
+    ActivityType:
+      type: string
+      enum:
+        - device
+        - location
+        - mode
 
     AddRecipeRequest:
       required:
@@ -160,10 +180,13 @@ components:
         name:
           type: string
         type:
-          type: string
-          enum:
-            - device
-            - member
+          $ref: '#/components/schemas/AffectorType'
+
+    AffectorType:
+      type: string
+      enum:
+        - device
+        - member
 
     AmazonAccount:
       properties:
@@ -239,11 +262,12 @@ components:
         valid:
           type: boolean
 
-    ContactState:
+    CoState:
       type: string
       enum:
-        - open
-        - close
+        - emergency
+        - ok
+        - testing
 
     Device:
       required:
@@ -341,14 +365,16 @@ components:
                   type: string
                   format: date-time
                 state:
-                  oneOf: # This might necessitate some refactoring…
-                    - $ref: '#/components/schemas/ContactState'
-                    - $ref: '#/components/schemas/MotionState'
-                    - $ref: '#/components/schemas/SmokeState'
-                    - $ref: '#/components/schemas/WaterState'
+                  oneOf:
+                    - $ref: '#/components/schemas/AccessSensorState'
+                    - $ref: '#/components/schemas/DoorPanelState'
+                    - $ref: '#/components/schemas/GlassBreakState'
+                    - $ref: '#/components/schemas/MotionSensorState'
+                    - $ref: '#/components/schemas/SmokeAlarmState'
+                    - $ref: '#/components/schemas/WaterSensorState'
                 tamper:
                   type: boolean
-            # zigbee: {}
+            # TODO: zigbee: {}
         type:
           $ref: '#/components/schemas/DeviceType'
         updated:
@@ -365,10 +391,13 @@ components:
         device_id:
           type: string
         event:
-          type: string
-          enum:
-            - alarmed
-            - dismissed
+          $ref: '#/components/schemas/DeviceAlarmEventType'
+
+    DeviceAlarmEventType:
+      type: string
+      enum:
+        - alarmed
+        - dismissed
 
     DeviceEventType:
       type: string
@@ -407,6 +436,12 @@ components:
         - motion_sensor
         - smoke_alarm
         - water_sensor
+
+    DoorPanelState:
+      type: string
+      enum:
+        - open
+        - close
 
     EnvironmentalAlarm:
       required:
@@ -458,6 +493,10 @@ components:
         sent:
           type: boolean
 
+    # TODO: figure this out
+    GlassBreakState:
+      type: object
+
     Hub:
       required:
         - created
@@ -478,10 +517,7 @@ components:
             - chirps
           properties:
             chirp:
-              type: string
-              enum:
-                - single
-                # - ?
+              $ref: '#/components/schemas/HubChirp'
             chirps:
               required:
                 - arming
@@ -499,24 +535,24 @@ components:
         reported:
           required:
             - battery
-            # - cellular
-            # - connection
+            # - cellular?
+            # - connection?
             - fw_version
-            # - led
-            # - logging
-            # - mac_address
-            # - siren
+            # - led?
+            # - logging?
+            # - mac_address?
+            # - siren?
             - status
-            # - wifi
-            # - zigbee
-            # - zwave
+            # - wifi?
+            # - zigbee?
+            # - zwave?
           properties:
             battery:
               required:
                 - active
                 - at
                 - level
-                # - temperature
+                # - temperature?
               properties:
                 active:
                   type: boolean
@@ -530,17 +566,15 @@ components:
                   format: date-time
                 temperature:
                   type: integer
-            # cellular: {}
-            # connection: {}
+            # TODO: cellular: {}
+            # TODO: connection: {}
             fw_version:
               type: string
             hw_version:
               type: string
             led:
               type: string
-              enum:
-                - green
-                # - ?
+              # TODO enum: green, …?
             logging:
               type: boolean
             mac_address:
@@ -549,9 +583,7 @@ components:
               type: boolean
             status:
               type: string
-              enum:
-                - active
-                # - ?
+              # TODO: enum: active, …?
             temperature:
               type: integer
             wifi:
@@ -564,20 +596,29 @@ components:
                 at:
                   type: string
                   format: date-time
-            # zigbee: {}
-            # zwave: {}
+            # TODO: zigbee: {}
+            # TODO: zwave: {}
         serial_number:
           type: string
         type:
-          type: string
-          enum:
-            - scout1
-            - scout1S
+          $ref: '#/components/schemas/HubType'
         updated:
           type: string
           format: date-time
         version:
           type: string
+
+    HubChirp:
+      type: string
+      enum:
+        - single
+        # - ?
+
+    HubType:
+      type: string
+      enum:
+        - scout1
+        - scout1S
 
     Location:
       required:
@@ -955,7 +996,7 @@ components:
         - triggered
         - alarmed
 
-    MotionState:
+    MotionSensorState:
       type: string
       enum:
         - motion_start
@@ -995,10 +1036,7 @@ components:
         code:
           type: string
         interval:
-          type: string
-          enum:
-            - yr
-            - mo
+          $ref: '#/components/schemas/PlanInterval'
         name:
           type: string
 
@@ -1014,6 +1052,12 @@ components:
           type: string
         name:
           type: string
+
+    PlanInterval:
+      type: string
+      enum:
+        - yr
+        - mo
 
     ResetPasswordRequest:
       required:
@@ -1100,10 +1144,7 @@ components:
         - type
       properties:
         type:
-          type: string
-          enum:
-            - single
-            # - ?
+          $ref: '#/components/schemas/HubChirp'
 
     SetSirenRequest:
       required:
@@ -1137,15 +1178,21 @@ components:
           type: string
           format: password
 
-    SmokeState:
+    SmokeAlarmState:
       required:
         - smoke
       properties:
+        co:
+          $ref: '#/components/schemas/CoState'
         smoke:
-          type: string
-          enum:
-            - ok
-            # - ?
+          $ref: '#/components/schemas/SmokeState'
+
+    SmokeState:
+      type: string
+      enum:
+        - emergency
+        - ok
+        - testing
 
     Subscription:
       required:
@@ -1170,10 +1217,13 @@ components:
         plan:
           type: string
         state:
-          type: string
-          enum:
-            - active
-            # - ?
+          $ref: '#/components/schemas/SubscriptionState'
+
+    SubscriptionState:
+      type: string
+      enum:
+        - active
+        # - ?
 
     ToggleRecipeRequest:
       required:
@@ -1217,7 +1267,7 @@ components:
         name:
           type: string
 
-    WaterState:
+    WaterSensorState:
       type: string
       enum:
         - dry
