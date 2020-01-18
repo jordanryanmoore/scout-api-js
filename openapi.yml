@@ -1132,6 +1132,21 @@ components:
           type: string
           format: date-time
 
+    RfidEvent:
+      required:
+        - event
+        - token
+      properties:
+        event:
+          $ref: '#/components/schemas/RfidEventType'
+        token:
+          type: string
+
+    RfidEventType:
+      type: string
+      enum:
+        - swiped
+
     Session:
       required:
         - jwt
