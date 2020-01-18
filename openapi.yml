@@ -1118,12 +1118,16 @@ components:
         created:
           type: string
           format: date-time
+          readOnly: true
         hub_id:
           type: string
+          readOnly: true
         id:
           type: string
+          readOnly: true
         location_id:
           type: string
+          readOnly: true
         mode_id:
           type: string
         name:
@@ -1133,9 +1137,11 @@ components:
         # swiped: null
         token:
           type: string
+          readOnly: true
         updated:
           type: string
           format: date-time
+          readOnly: true
 
     RfidEvent:
       required:
@@ -2345,6 +2351,27 @@ paths:
           $ref: '#/components/responses/ErrorResponse'
         200:
           $ref: '#/components/responses/EmptyResponse'
+      security:
+        - jwt: []
+    put:
+      tags:
+        - authenticated
+        - rfids
+      operationId: updateRfid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Rfid'
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: The updated RFID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rfid'
       security:
         - jwt: []
 
