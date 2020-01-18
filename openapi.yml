@@ -948,6 +948,7 @@ components:
               type: array
               items:
                 type: string
+                format: email
             entry_delay:
               type: integer
             lights:
@@ -990,11 +991,17 @@ components:
     ModeState:
       type: string
       enum:
-        - disarmed
-        - arming
-        - armed
-        - triggered
         - alarmed
+        - armed
+        - arming
+        - disarmed
+        - triggered
+
+    ModeStateUpdate:
+      type: string
+      enum:
+        - arming
+        - disarm
 
     MotionSensorState:
       type: string
@@ -1230,7 +1237,7 @@ components:
         - state
       properties:
         state:
-          $ref: '#/components/schemas/ModeState'
+          $ref: '#/components/schemas/ModeStateUpdate'
 
     UpdatePasswordRequest:
       required:
