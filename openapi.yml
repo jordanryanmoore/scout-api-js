@@ -15,6 +15,20 @@ servers:
 
 components:
   parameters:
+    DeviceId:
+      name: device_id
+      in: path
+      required: true
+      schema:
+        type: string
+
+    Email:
+      name: email
+      in: query
+      required: true
+      schema:
+        type: string
+
     HubId:
       name: hub_id
       in: path
@@ -50,6 +64,20 @@ components:
       schema:
         type: string
 
+    PlanCode:
+      name: plan_code
+      in: path
+      required: true
+      schema:
+        type: string
+
+    RfidId:
+      name: rfid_id
+      in: path
+      required: true
+      schema:
+        type: string
+
     SerialNumber:
       name: serial_number
       in: path
@@ -58,6 +86,85 @@ components:
         type: string
 
   schemas:
+    Activity:
+      required:
+        - description
+        - effected
+        - event
+        - id
+        - item_id
+        - location_id
+        - timestamp
+        - type
+      properties:
+        affector:
+          $ref: '#/components/schemas/Affector'
+        description:
+          type: string
+        effected:
+          required:
+            - value
+          properties:
+            type:
+              $ref: '#/components/schemas/DeviceType'
+            value:
+              type: string
+        event:
+          type: string
+          enum:
+            - armed
+            - close
+            - created
+            - disarmed
+            - dismissed
+            - dry
+            - open
+            - paired
+            - smoke_ok
+            - smoke_testing
+            # - smoke_?
+            - unpaired
+            - wet
+            # - ?
+        id:
+          type: string
+        item_id:
+          type: string
+        location_id:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        type:
+          type: string
+          enum:
+            - device
+            - location
+            - mode
+
+    AddRecipeRequest:
+      required:
+        - location_id
+      properties:
+        location_id:
+          type: string
+
+    Affector:
+      required:
+        - id
+        - name
+        - type
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+          enum:
+            - device
+            - member
+
     AmazonAccount:
       properties:
         modes:
@@ -80,6 +187,43 @@ components:
             type: string
         token:
           type: boolean
+
+    BillingInfo:
+      required:
+        - card
+        - expires
+        - last_four
+        - name
+        - postal_code
+      properties:
+        card:
+          type: string
+        expires:
+          type: string
+          # pattern:
+        last_four:
+          type: string
+          minLength: 4
+          maxLength: 4
+        name:
+          type: string
+        postal_code:
+          type: string
+      example:
+        card: Visa
+        expires: 3/2020
+        last_four: "1234"
+        name: John Smith
+        postal_code: 98765
+  
+    BillingToken:
+      required:
+        - token
+      properties:
+        token:
+          type: string
+          format: password
+          description: A recurly token.
   
     CheckInstallCodeResponse:
       required:
@@ -147,13 +291,11 @@ components:
         pro_monitoring_label:
           type: string
         reported:
-          type: object
           required:
             - fw_version
             - timedout
           properties:
             battery:
-              type: object
               required:
                 - at
               properties:
@@ -166,7 +308,6 @@ components:
             fw_version:
               type: string
             humidity:
-              type: object
               required:
                 - at
                 - percent
@@ -181,7 +322,6 @@ components:
             model:
               type: string
             temperature:
-              type: object
               required:
                 - at
                 - degrees
@@ -194,7 +334,6 @@ components:
             timedout:
               type: boolean
             trigger:
-              type: object
               required:
                 - at
               properties:
@@ -216,6 +355,30 @@ components:
           type: string
           format: date-time
 
+    DeviceAlarmEvent:
+      required:
+        - device_id
+        - event
+      properties:
+        affector:
+          $ref: '#/components/schemas/Affector'
+        device_id:
+          type: string
+        event:
+          type: string
+          enum:
+            - alarmed
+            - dismissed
+
+    DeviceEventType:
+      type: string
+      enum:
+        - alarmed
+        - dismissed
+        - paired
+        - triggered
+        - unpaired
+
     DeviceGroup:
       required:
         - name
@@ -228,6 +391,13 @@ components:
           items:
             type: string
 
+    DeviceTestState:
+      required:
+        - test
+      properties:
+        test:
+          type: boolean
+
     DeviceType:
       type: string
       enum:
@@ -237,6 +407,41 @@ components:
         - motion_sensor
         - smoke_alarm
         - water_sensor
+
+    EnvironmentalAlarm:
+      required:
+        - alarmed
+      properties:
+        alarmed:
+          type: array
+          items:
+            type: string
+
+    ErrorResponse:
+      required:
+        - status
+        - error
+      properties:
+        status:
+          type: integer
+          minimum: 400
+          maximum: 600
+          exclusiveMaximum: true
+        error:
+          type: string
+
+    EventType:
+      type: string
+      enum:
+        - device
+        - hub
+        - mode
+        - rfid
+
+    FindMemberResponse:
+      properties:
+        member_id:
+          type: string
 
     ForgotPasswordRequest:
       required:
@@ -307,7 +512,6 @@ components:
             # - zwave
           properties:
             battery:
-              type: object
               required:
                 - active
                 - at
@@ -383,6 +587,7 @@ components:
         - environmental
         - id
         - member_ids
+        - member_state
         - mode_ids
         - name
         - plan
@@ -460,13 +665,7 @@ components:
           items:
             type: string
         environmental:
-          required:
-            - alarmed
-          properties:
-            alarmed:
-              type: array
-              items:
-                type: string
+          $ref: '#/components/schemas/EnvironmentalAlarm'
         hub_id:
           type: string
         id:
@@ -476,7 +675,7 @@ components:
           items:
             type: string
         member_state:
-          $ref: '#/components/schemas/MemberState'
+          $ref: '#/components/schemas/LocationMemberState'
         mode_ids:
           type: array
           items:
@@ -535,19 +734,7 @@ components:
           items:
             type: string
         state:
-          type: object
-          required:
-            - install
-            - visible
-          properties:
-            armed:
-              type: string
-            install:
-              type: boolean
-            ready:
-              type: boolean
-            visible:
-              type: boolean
+          $ref: '#/components/schemas/LocationState'
         structure_type:
           $ref: '#/components/schemas/LocationStructureType'
         subscription_id:
@@ -559,6 +746,46 @@ components:
         updated:
           type: string
           format: date-time
+
+    LocationMember:
+      required:
+        - email
+        - fname
+        - id
+        - state
+      properties:
+        email:
+          type: string
+        fname:
+          type: string
+        id:
+          type: string
+          readOnly: true
+        lname:
+          type: string
+        state:
+          $ref: '#/components/schemas/LocationMemberState'
+
+    LocationMemberState:
+      type: string
+      enum:
+        - admin
+        - member
+      readOnly: true
+
+    LocationState:
+      required:
+        - install
+        - visible
+      properties:
+        armed:
+          type: string
+        install:
+          type: boolean
+        ready:
+          type: boolean
+        visible:
+          type: boolean
 
     LocationStructureType:
       type: string
@@ -587,32 +814,90 @@ components:
           type: string
           format: password
 
-    MemberState:
-      type: string
-      enum:
-        - admin
-        - member
+    Member:
+      required:
+        - address
+        - beta_tester
+        - created
+        - email
+        - fname
+        - id
+        - location_ids
+        - notifications
+      properties:
+        address:
+          properties:
+            addr1:
+              type: string
+            city:
+              type: string
+            country:
+              type: string
+            state:
+              type: string
+            timezone:
+              type: string
+            zipcode:
+              type: string
+        beta_tester:
+          type: boolean
+        connected_accounts:
+          # required:
+            # - amazon
+            # - discourse
+            # - ifttt
+          properties:
+            amazon:
+              type: boolean
+            discourse:
+              type: boolean
+            ifttt:
+              type: boolean
+        created:
+          type: string
+          format: date-time
+        email:
+          type: string
+          format: email
+        fname:
+          type: string
+        helpscout_id:
+          type: integer
+        id:
+          type: string
+        lname:
+          type: string
+        location_ids:
+          type: array
+          items:
+            type: string
+        phone_number:
+          type: string
+        notifications:
+          required:
+            - alarm_state_change
+            - lost_sensor
+            - power_outage
+          properties:
+            alarm_state_change:
+              type: boolean
+            lost_sensor:
+              type: boolean
+            power_outage:
+              type: boolean
+        updated:
+          type: string
+          format: date-time
 
     Mode:
       required:
-        - actions
         - created
-        - device_ids
         - id
         - location_id
         - name
         - state
       properties:
         actions:
-          required:
-            - camera_record
-            - count_down
-            - email
-            - entry_delay
-            - lights
-            - professional_monitoring
-            - push
-            - siren
           properties:
             camera_record:
               type: boolean
@@ -651,6 +936,16 @@ components:
           type: string
           format: date-time
 
+    ModeEvent:
+      required:
+        - mode_id
+        - event
+      properties:
+         mode_id:
+           type: string
+         event:
+           $ref: '#/components/schemas/ModeState'
+
     ModeState:
       type: string
       enum:
@@ -665,6 +960,60 @@ components:
       enum:
         - motion_start
         - motion_stop
+
+    PairDeviceRequest:
+      required:
+        - device_type
+        - location_id
+      properties:
+        device_type:
+          $ref: '#/components/schemas/DeviceType'
+        location_id:
+          type: string
+
+    PairDeviceResponse:
+      required:
+        - device_type
+      properties:
+        device_type:
+          $ref: '#/components/schemas/DeviceType'
+
+    Plan:
+      required:
+        - amount
+        - addons
+        - code
+        - interval
+        - name
+      properties:
+        amount:
+          type: number
+        addons:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlanAddon'
+        code:
+          type: string
+        interval:
+          type: string
+          enum:
+            - yr
+            - mo
+        name:
+          type: string
+
+    PlanAddon:
+      required:
+        - amount
+        - code
+        - name
+      properties:
+        amount:
+          type: number
+        code:
+          type: string
+        name:
+          type: string
 
     ResetPasswordRequest:
       required:
@@ -681,12 +1030,70 @@ components:
           type: string
           format: password
 
+    Rfid:
+      required:
+        - active
+        - created
+        - hub_id
+        - id
+        - location_id
+        - mode_id
+        - name
+        - token
+      properties:
+        active:
+          type: boolean
+        created:
+          type: string
+          format: date-time
+        hub_id:
+          type: string
+        id:
+          type: string
+        location_id:
+          type: string
+        mode_id:
+          type: string
+        name:
+          type: string
+        schedule:
+          required:
+            - days
+            - end_time
+            - start_time
+          properties:
+            days:
+              type: array
+              items:
+                type: integer
+                minimum: 0
+                maximum: 6
+            end_time:
+              type: string
+              # pattern: 17:00
+            start_time:
+              type: string
+              # pattern: 9:00
+        # swiped: null
+        token:
+          type: string
+        updated:
+          type: string
+          format: date-time
+
     Session:
       required:
         - jwt
       properties:
         jwt:
           type: string
+
+    SetAdminRequest:
+      required:
+        - admin
+      properties:
+        admin:
+          type: boolean
 
     SetChirpRequest:
       required:
@@ -697,6 +1104,13 @@ components:
           enum:
             - single
             # - ?
+
+    SetSirenRequest:
+      required:
+        - on
+      properties:
+        on:
+          type: boolean
 
     SignupRequest:
       required:
@@ -731,6 +1145,34 @@ components:
           type: string
           enum:
             - ok
+            # - ?
+
+    Subscription:
+      required:
+        - addons
+        - amount
+        - plan
+        - state
+      properties:
+        addons:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlanAddon'
+        amount:
+          type: number
+        cloud_video_recording:
+          type: array
+          items: # TODO
+            type: object
+        next_cycle:
+          type: string
+          format: date-time
+        plan:
+          type: string
+        state:
+          type: string
+          enum:
+            - active
             # - ?
 
     ToggleRecipeRequest:
@@ -768,11 +1210,33 @@ components:
           type: string
           format: email
 
+    UpdateRecipeRequest:
+      required:
+        - name
+      properties:
+        name:
+          type: string
+
     WaterState:
       type: string
       enum:
         - dry
         - wet
+
+  responses:
+    EmptyResponse:
+      description: An empty response.
+      content:
+        application/json:
+          schema:
+            type: object
+
+    ErrorResponse:
+      description: An error response.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
 
   securitySchemes:
     jwt:
@@ -783,7 +1247,9 @@ components:
 paths:
   /auth:
     post:
-      tags: [auth]
+      tags:
+        - authentication
+        - unauthenticated
       operationId: login
       requestBody:
         content:
@@ -791,6 +1257,8 @@ paths:
             schema:
               $ref: '#/components/schemas/LoginRequest'
       responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
         200:
           description: A new session for the member.
           content:
@@ -799,7 +1267,9 @@ paths:
                 $ref: '#/components/schemas/Session'
 
     put:
-      tags: [auth]
+      tags:
+        - authentication
+        - unauthenticated
       operationId: forgotPassword
       requestBody:
         content:
@@ -807,6 +1277,8 @@ paths:
             schema:
               $ref: '#/components/schemas/ForgotPasswordRequest'
       responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
         200:
           description: If the email was sent.
           content:
@@ -816,7 +1288,9 @@ paths:
 
   /auth/email:
     put:
-      tags: [general]
+      tags:
+        - authentication
+        - authenticated
       operationId: updateEmail
       requestBody:
         content:
@@ -824,6 +1298,8 @@ paths:
             schema:
               $ref: '#/components/schemas/UpdateEmailRequest'
       responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
         200:
           description: A new session for the member.
           content:
@@ -835,7 +1311,9 @@ paths:
 
   /auth/password:
     post:
-      tags: [auth]
+      tags:
+        - authentication
+        - unauthenticated
       operationId: resetPassword
       requestBody:
         content:
@@ -843,6 +1321,8 @@ paths:
             schema:
               $ref: '#/components/schemas/ResetPasswordRequest'
       responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
         200:
           description: A new session for the member.
           content:
@@ -851,7 +1331,9 @@ paths:
                 $ref: '#/components/schemas/Session'
 
     put:
-      tags: [general]
+      tags:
+        - authentication
+        - authenticated
       operationId: updatePassword
       requestBody:
         content:
@@ -859,6 +1341,8 @@ paths:
             schema:
               $ref: '#/components/schemas/UpdatePasswordRequest'
       responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
         200:
           description: A new session for the member.
           content:
@@ -870,7 +1354,9 @@ paths:
 
   /auth/signup:
     post:
-      tags: [auth]
+      tags:
+        - authentication
+        - unauthenticated
       operationId: signup
       requestBody:
         content:
@@ -878,6 +1364,8 @@ paths:
             schema:
               $ref: '#/components/schemas/SignupRequest'
       responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
         200:
           description: A new session for the member.
           content:
@@ -885,11 +1373,114 @@ paths:
               schema:
                 $ref: '#/components/schemas/Session'
 
-  /hubs/{hub_id}:
+  /devices:
+    put:
+      tags:
+        - authenticated
+        - devices
+      operationId: pairDevice
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PairDeviceRequest'
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: The device pairing response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PairDeviceResponse'
+      security:
+        - jwt: []
+
+  /devices/{device_id}:
+    parameters:
+      - $ref: '#/components/parameters/DeviceId'
+    get:
+      tags:
+        - authenticated
+        - devices
+      operationId: getDevice
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: The device.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+      security:
+        - jwt: []
+
+  /devices/{device_id}/activity:
+    parameters:
+      - $ref: '#/components/parameters/DeviceId'
+    get:
+      tags:
+        - authenticated
+        - devices
+      operationId: getDeviceActivity
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: A list of the device's activities.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Activity'
+      security:
+        - jwt: []
+
+  /devices/{device_id}/test:
+    parameters:
+      - $ref: '#/components/parameters/DeviceId'
+    delete:
+      tags:
+        - authenticated
+        - devices
+      operationId: unsetTestMode
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: The device's test state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceTestState'
+      security:
+        - jwt: []
+    put:
+      tags:
+        - authenticated
+        - devices
+      operationId: setTestMode
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: The device's test state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceTestState'
+      security:
+        - jwt: []
+
+  /hubs/{hub_id}/chirp:
     parameters:
       - $ref: '#/components/parameters/HubId'
     put:
-      tags: [general]
+      tags:
+        - authenticated
+        - hubs
       operationId: setChirp
       requestBody:
         content:
@@ -897,6 +1488,33 @@ paths:
             schema:
               $ref: '#/components/schemas/SetChirpRequest'
       responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: The hub.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Hub'
+      security:
+        - jwt: []
+
+  /hubs/{hub_id}/siren:
+    parameters:
+      - $ref: '#/components/parameters/HubId'
+    put:
+      tags:
+        - authenticated
+        - hubs
+      operationId: setSiren
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetSirenRequest'
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
         200:
           description: The hub.
           content:
@@ -910,9 +1528,13 @@ paths:
     parameters:
       - $ref: '#/components/parameters/InstallCode'
     get:
-      tags: [auth]
+      tags:
+        - unauthenticated
+        - hubs
       operationId: checkInstallCode
       responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
         200:
           description: If the install code is valid.
           content:
@@ -924,9 +1546,13 @@ paths:
     parameters:
       - $ref: '#/components/parameters/SerialNumber'
     get:
-      tags: [auth]
+      tags:
+        - unauthenticated
+        - hubs
       operationId: checkSerialNumber
       responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
         200:
           description: If the serial number is valid.
           content:
@@ -934,13 +1560,101 @@ paths:
               schema:
                 $ref: '#/components/schemas/CheckSerialNumberResponse'
 
+  /locations/{location_id}:
+    parameters:
+      - $ref: '#/components/parameters/LocationId'
+    get:
+      tags:
+        - authenticated
+        - locations
+      operationId: getLocation
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: The location.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Location'
+      security:
+        - jwt: []
+
+  /locations/{location_id}/activity:
+    parameters:
+      - $ref: '#/components/parameters/LocationId'
+    get:
+      tags:
+        - authenticated
+        - locations
+      operationId: getActivity
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: A list of the location's activities.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Activity'
+      security:
+        - jwt: []
+
+  /locations/{location_id}/billing:
+    parameters:
+      - $ref: '#/components/parameters/LocationId'
+    get:
+      tags:
+        - authenticated
+        - locations
+      operationId: getBillingInfo
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: The location's billing information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingInfo'
+      security:
+        - jwt: []
+    put:
+      tags:
+        - authenticated
+        - locations
+      operationId: updateBillingInfo
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillingToken'
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: The location's billing information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingInfo'
+      security:
+        - jwt: []
+
   /locations/{location_id}/devices:
     parameters:
       - $ref: '#/components/parameters/LocationId'
     get:
-      tags: [general]
+      tags:
+        - authenticated
+        - devices
+        - locations
       operationId: getDevices
       responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
         200:
           description: A list of the location's devices.
           content:
@@ -952,13 +1666,70 @@ paths:
       security:
         - jwt: []
 
+  /locations/{location_id}/environmental:
+    parameters:
+      - $ref: '#/components/parameters/LocationId'
+    delete:
+      tags:
+        - authenticated
+        - locations
+      operationId: dismissEnvironmental
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: The location's environmental alarm.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvironmentalAlarm'
+      security:
+        - jwt: []
+    get:
+      tags:
+        - authenticated
+        - locations
+      operationId: getEnvironmental
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: The location's environmental alarm.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvironmentalAlarm'
+      security:
+        - jwt: []
+    post:
+      tags:
+        - authenticated
+        - locations
+      operationId: triggerEnvironmental
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: The location's environmental alarm.
+          content:
+            application/json:
+              schema: # TODO
+                type: object
+      security:
+        - jwt: []
+
   /locations/{location_id}/hub:
     parameters:
       - $ref: '#/components/parameters/LocationId'
     get:
-      tags: [general]
+      tags:
+        - authenticated
+        - hubs
+        - locations
       operationId: getHub
       responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
         200:
           description: The location's hub.
           content:
@@ -968,13 +1739,143 @@ paths:
       security:
         - jwt: []
 
+  /locations/{location_id}/install:
+    parameters:
+      - $ref: '#/components/parameters/LocationId'
+    delete:
+      tags:
+        - authenticated
+        - locations
+      operationId: unsetInstallMode
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: The location's install state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocationState'
+      security:
+        - jwt: []
+    put:
+      tags:
+        - authenticated
+        - locations
+      operationId: setInstallMode
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: The location's install state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocationState'
+      security:
+        - jwt: []
+
+  /locations/{location_id}/members:
+    parameters:
+      - $ref: '#/components/parameters/LocationId'
+    get:
+      tags:
+        - authenticated
+        - locations
+        - members
+      operationId: getMembers
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: A list of the location's members.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LocationMember'
+      security:
+        - jwt: []
+    post:
+      tags:
+        - authenticated
+        - locations
+        - members
+      operationId: addMember
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocationMember'
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: A list of the location's members.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LocationMember'
+      security:
+        - jwt: []
+
+  /locations/{location_id}/members/{member_id}:
+    parameters:
+      - $ref: '#/components/parameters/LocationId'
+      - $ref: '#/components/parameters/MemberId'
+    delete:
+      tags:
+        - authenticated
+        - locations
+        - members
+      operationId: removeMember
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          $ref: '#/components/responses/EmptyResponse'
+      security:
+        - jwt: []
+    put:
+      tags:
+        - authenticated
+        - locations
+        - members
+      operationId: setAdmin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetAdminRequest'
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: A list of the location's members.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LocationMember'
+      security:
+        - jwt: []
+
   /locations/{location_id}/modes:
     parameters:
       - $ref: '#/components/parameters/LocationId'
     get:
-      tags: [general]
+      tags:
+        - authenticated
+        - locations
+        - modes
       operationId: getModes
       responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
         200:
           description: A list of the location's modes.
           content:
@@ -986,13 +1887,144 @@ paths:
       security:
         - jwt: []
 
+  /locations/{location_id}/plans:
+    parameters:
+      - $ref: '#/components/parameters/LocationId'
+    get:
+      tags:
+        - authenticated
+        - locations
+      operationId: getPlans
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: The location's plans.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Plan'
+      security:
+        - jwt: []
+
+  /locations/{location_id}/rfids:
+    parameters:
+      - $ref: '#/components/parameters/LocationId'
+    get:
+      tags:
+        - authenticated
+        - locations
+        - rfids
+      operationId: getRfids
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: A list of the location's RFIDs.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Rfid'
+      security:
+        - jwt: []
+
+  /locations/{location_id}/subscription:
+    parameters:
+      - $ref: '#/components/parameters/LocationId'
+    get:
+      tags:
+        - authenticated
+        - locations
+      operationId: getSubscription
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: The location's subscription.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+      security:
+        - jwt: []
+
+  /locations/{location_id}/subscription/{plan_code}:
+    parameters:
+      - $ref: '#/components/parameters/LocationId'
+      - $ref: '#/components/parameters/PlanCode'
+    get:
+      tags:
+        - authenticated
+        - locations
+      operationId: getPlanSubscription
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: The location's subscription if it was switched to the given plan.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+      security:
+        - jwt: []
+
+  /members:
+    get:
+      tags:
+        - authenticated
+        - members
+      operationId: findMember
+      parameters:
+        - $ref: '#/components/parameters/Email'
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: A matching member, if any.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FindMemberResponse'
+      security:
+        - jwt: []
+
+  /members/{member_id}:
+    parameters:
+      - $ref: '#/components/parameters/MemberId'
+    get:
+      tags:
+        - authenticated
+        - members
+      operationId: getProfile
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: The member's profile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Member'
+      security:
+        - jwt: []
+
   /members/{member_id}/locations:
     parameters:
       - $ref: '#/components/parameters/MemberId'
     get:
-      tags: [general]
+      tags:
+        - authenticated
+        - members
+        - locations
       operationId: getLocations
       responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
         200:
           description: A list of the member's locations.
           content:
@@ -1004,11 +2036,48 @@ paths:
       security:
         - jwt: []
 
+  /modes:
+    post:
+      tags:
+        - authenticated
+        - modes
+      operationId: addRecipe
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddRecipeRequest'
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: The new recipe.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mode'
+      security:
+        - jwt: []
+
   /modes/{mode_id}:
     parameters:
       - $ref: '#/components/parameters/ModeId'
+    delete:
+      tags:
+        - authenticated
+        - modes
+      operationId: removeRecipe
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          $ref: '#/components/responses/EmptyResponse'
+      security:
+        - jwt: []
     post:
-      tags: [general]
+      tags:
+        - authenticated
+        - modes
       operationId: toggleRecipe
       requestBody:
         content:
@@ -1016,6 +2085,29 @@ paths:
             schema:
               $ref: '#/components/schemas/ToggleRecipeRequest'
       responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: The updated recipe.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mode'
+      security:
+        - jwt: []
+    put:
+      tags:
+        - authenticated
+        - modes
+      operationId: updateRecipe
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRecipeRequest'
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
         200:
           description: The updated recipe.
           content:
@@ -1025,6 +2117,77 @@ paths:
       security:
         - jwt: []
 
+  /modes/{mode_id}/devices/{device_id}:
+    parameters:
+      - $ref: '#/components/parameters/ModeId'
+      - $ref: '#/components/parameters/DeviceId'
+    delete:
+      tags:
+        - authenticated
+        - devices
+        - modes
+      operationId: removeRecipeDevice
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: The updated recipe.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mode'
+      security:
+        - jwt: []
+    put:
+      tags:
+        - authenticated
+        - devices
+        - modes
+      operationId: addRecipeDevice
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: The updated recipe.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mode'
+      security:
+        - jwt: []
+
+  /rfids/{rfid_id}:
+    parameters:
+      - $ref: '#/components/parameters/RfidId'
+    delete:
+      tags:
+        - authenticated
+        - rfids
+      operationId: removeRfid
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          $ref: '#/components/responses/EmptyResponse'
+      security:
+        - jwt: []
+
 tags:
-  - name: general
-  - name: auth
+  - description: Operations that require prior authentication.
+    name: authenticated
+  - description: Operations that deal with authentication.
+    name: authentication
+  - description: Operations that deal with devices.
+    name: devices
+  - description: Operations that deal with hubs.
+    name: hubs
+  - description: Operations that deal with locations.
+    name: locations
+  - description: Operations that deal with members.
+    name: members
+  - description: Operations that deal with modes.
+    name: modes
+  - description: Operations that deal with RFIDs.
+    name: rfids
+  - description: Operations that do not require prior authentication.
+    name: unauthenticated
