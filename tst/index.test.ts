@@ -1,13 +1,13 @@
-import { AuthApiFactory, GeneralApiFactory, AuthApi, GeneralApi } from "../src";
+import { UnauthenticatedApi, AuthenticatedApi } from "../src";
 
-test("AuthApiFactory", async () => {
-    const api = AuthApiFactory();
+test("UnauthenticatedApi", async () => {
+    const api = new UnauthenticatedApi();
 
     expect(api).toHaveProperty("login");
 });
 
-test("GeneralApiFactory", async () => {
-    const api = GeneralApiFactory();
+test("AuthenticatedApi", async () => {
+    const api = new AuthenticatedApi();
 
     expect(api).toHaveProperty("getLocations");
 });
