@@ -1908,7 +1908,13 @@ paths:
         default:
           $ref: '#/components/responses/ErrorResponse'
         200:
-          $ref: '#/components/responses/EmptyResponse'
+          description: A list of the location's remaining members.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LocationMember'
       security:
         - jwt: []
     put:
