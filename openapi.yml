@@ -633,7 +633,7 @@ components:
       type: string
       enum:
         - single
-        # - ?
+        - "off"
 
     HubType:
       type: string
