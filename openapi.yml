@@ -85,6 +85,13 @@ components:
       schema:
         type: string
 
+    UserCodeId:
+      name: user_code_id
+      in: path
+      required: true
+      schema:
+        type: string
+
   schemas:
     AccessSensorState:
       type: string
@@ -167,6 +174,20 @@ components:
         - location_id
       properties:
         location_id:
+          type: string
+
+    AddUserCodeRequest:
+      required:
+        - code
+        - location_id
+        - name
+      properties:
+        code:
+          type: string
+          format: password
+        location_id:
+          type: string
+        name:
           type: string
 
     Affector:
@@ -1108,23 +1129,7 @@ components:
         name:
           type: string
         schedule:
-          required:
-            - days
-            - end_time
-            - start_time
-          properties:
-            days:
-              type: array
-              items:
-                type: integer
-                minimum: 0
-                maximum: 6
-            end_time:
-              type: string
-              # pattern: 17:00
-            start_time:
-              type: string
-              # pattern: 9:00
+          $ref: '#/components/schemas/Schedule'
         # swiped: null
         token:
           type: string
@@ -1153,6 +1158,25 @@ components:
       properties:
         jwt:
           type: string
+
+    Schedule:
+      required:
+        - days
+        - end_time
+        - start_time
+      properties:
+        days:
+          type: array
+          items:
+            type: integer
+            minimum: 0
+            maximum: 6
+        end_time:
+          type: string
+          # pattern: 17:00
+        start_time:
+          type: string
+          # pattern: 9:00
 
     SetAdminRequest:
       required:
@@ -1288,6 +1312,57 @@ components:
       properties:
         name:
           type: string
+
+    UserCode:
+      required:
+        - active
+        - created
+        - disarm_on_entry
+        - hub_id
+        - id
+        - location_id
+        - name
+        - token
+      properties:
+        active:
+          type: boolean
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        disarm_on_entry:
+          type: boolean
+        hub_id:
+          type: string
+          readOnly: true
+        id:
+          type: string
+          readOnly: true
+        location_id:
+          type: string
+          readOnly: true
+        name:
+          type: string
+        schedule:
+          $ref: '#/components/schemas/Schedule'
+        token:
+          type: string
+          format: password
+        type:
+          $ref: '#/components/schemas/UserCodeType'
+        updated:
+          type: string
+          format: date-time
+          readOnly: true
+        user_id:
+          type: number
+          readOnly: true
+
+    UserCodeType:
+      type: string
+      enum:
+        - scheduled_code
+      readOnly: true
 
     WaterSensorState:
       type: string
@@ -2051,6 +2126,29 @@ paths:
       security:
         - jwt: []
 
+  /locations/{location_id}/user_codes:
+    parameters:
+      - $ref: '#/components/parameters/LocationId'
+    get:
+      tags:
+        - authenticated
+        - locations
+        - userCodes
+      operationId: getUserCodes
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: The location's user codes.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserCode'
+      security:
+        - jwt: []
+
   /members:
     get:
       tags:
@@ -2250,6 +2348,82 @@ paths:
       security:
         - jwt: []
 
+  /user_codes:
+    post:
+      tags:
+        - authenticated
+        - userCodes
+      operationId: addUserCode
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddUserCodeRequest'
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: The new user code.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserCode'
+      security:
+        - jwt: []
+
+  /user_codes/{user_code_id}:
+    parameters:
+      - $ref: '#/components/parameters/UserCodeId'
+    delete:
+      tags:
+        - authenticated
+        - userCodes
+      operationId: removeUserCode
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          $ref: '#/components/responses/EmptyResponse'
+      security:
+        - jwt: []
+    get:
+      tags:
+        - authenticated
+        - userCodes
+      operationId: getUserCode
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: The user code.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserCode'
+      security:
+        - jwt: []
+    put:
+      tags:
+        - authenticated
+        - userCodes
+      operationId: updateUserCode
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCode'
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: The updated user code.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserCode'
+      security:
+        - jwt: []
+
 tags:
   - description: Operations that require prior authentication.
     name: authenticated
@@ -2269,3 +2443,5 @@ tags:
     name: rfids
   - description: Operations that do not require prior authentication.
     name: unauthenticated
+  - description: Operations that deal with user codes.
+    name: userCodes
