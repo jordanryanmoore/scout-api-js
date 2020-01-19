@@ -749,48 +749,7 @@ components:
         plan:
           $ref: '#/components/schemas/LocationPlan'
         pro_monitoring:
-          required:
-            - address1
-            - city
-            - region
-            - structure_type
-            - time_zone
-            - zipcode
-          properties:
-            account_number:
-              type: string
-            address1:
-              type: string
-            address2:
-              type: string
-            alternative_phone:
-              type: string
-            city:
-              type: string
-            county:
-              type: string
-            created:
-              type: string
-              format: date-time
-            cross_street:
-              type: string
-            name:
-              type: string
-            passcodes:
-              type: array
-              items:
-                type: string
-                format: password
-            phone:
-              type: string
-            region:
-              type: string
-            structure_type:
-              type: string
-            time_zone:
-              type: string
-            zipcode:
-              type: string
+          $ref: '#/components/schemas/ProMonitoring'
         rfid_ids:
           type: array
           items:
@@ -1097,6 +1056,52 @@ components:
       enum:
         - yr
         - mo
+
+    ProMonitoring:
+      required:
+        - address1
+        - city
+        - region
+        - structure_type
+        - time_zone
+        - zipcode
+      properties:
+        account_number:
+          type: string
+        address1:
+          type: string
+        address2:
+          type: string
+        agreement_request:
+          type: string
+        alternative_phone:
+          type: string
+        city:
+          type: string
+        county:
+          type: string
+        created:
+          type: string
+          format: date-time
+        cross_street:
+          type: string
+        name:
+          type: string
+        passcodes:
+          type: array
+          items:
+            type: string
+            format: password
+        phone:
+          type: string
+        region:
+          type: string
+        structure_type:
+          type: string
+        time_zone:
+          type: string
+        zipcode:
+          type: string
 
     ResetPasswordRequest:
       required:
@@ -2134,6 +2139,26 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Plan'
+      security:
+        - jwt: []
+
+  /locations/{location_id}/pro_monitoring:
+    parameters:
+      - $ref: '#/components/parameters/LocationId'
+    get:
+      tags:
+        - authenticated
+        - locations
+      operationId: getMonitoring
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: The location's pro monitoring.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProMonitoring'
       security:
         - jwt: []
 
