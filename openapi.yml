@@ -209,6 +209,25 @@ components:
         - device
         - member
 
+    AlarmContacts:
+      required:
+        - email
+        - phone_numbers
+        - sms_numbers
+      properties:
+        phone_numbers:
+          type: array
+          items:
+            type: string
+        sms_numbers:
+          type: array
+          items:
+            type: string
+        email:
+          type: array
+          items:
+            type: string
+
     AmazonAccount:
       properties:
         modes:
@@ -685,23 +704,7 @@ components:
           items:
             type: string
         alarm_contacts:
-          required:
-            - email
-            - phone_numbers
-            - sms_numbers
-          properties:
-            phone_numbers:
-              type: array
-              items:
-                type: string
-            sms_numbers:
-              type: array
-              items:
-                type: string
-            email:
-              type: array
-              items:
-                type: string
+          $ref: '#/components/schemas/AlarmContacts'
         # aliases: {}
         amazon_user_id:
           type: string
@@ -1816,6 +1819,28 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Activity'
+      security:
+        - jwt: []
+
+  /locations/{location_id}/alarm_contacts:
+    parameters:
+      - $ref: '#/components/parameters/LocationId'
+    get:
+      tags:
+        - authenticated
+        - locations
+      operationId: getAlarmContacts
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: The location's alarm contacts.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AlarmContacts'
       security:
         - jwt: []
 
