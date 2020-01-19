@@ -1205,6 +1205,13 @@ components:
         on:
           type: boolean
 
+    SetZwaveModeRequest:
+      required:
+        - mode
+      properties:
+        mode:
+          $ref: '#/components/schemas/ZwaveMode'
+
     SignupRequest:
       required:
         - email
@@ -1375,6 +1382,12 @@ components:
       enum:
         - dry
         - wet
+
+    ZwaveMode:
+      type: string
+      enum:
+        - exclusion
+        # - ?
 
   responses:
     EmptyResponse:
@@ -1665,6 +1678,31 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SetSirenRequest'
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: The hub.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Hub'
+      security:
+        - jwt: []
+
+  /hubs/{hub_id}/zwave:
+    parameters:
+      - $ref: '#/components/parameters/HubId'
+    put:
+      tags:
+        - authenticated
+        - hubs
+      operationId: setZwaveMode
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetZwaveModeRequest'
       responses:
         default:
           $ref: '#/components/responses/ErrorResponse'
