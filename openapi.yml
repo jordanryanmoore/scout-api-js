@@ -1068,12 +1068,14 @@ components:
       properties:
         account_number:
           type: string
+          readOnly: true
         address1:
           type: string
         address2:
           type: string
         agreement_request:
           type: string
+          readOnly: true
         alternative_phone:
           type: string
         city:
@@ -1083,7 +1085,10 @@ components:
         created:
           type: string
           format: date-time
+          readOnly: true
         cross_street:
+          type: string
+        instructions:
           type: string
         name:
           type: string
@@ -1098,6 +1103,11 @@ components:
           type: string
         structure_type:
           type: string
+          enum:
+            - Apartment-or-condo
+            - Business
+            - Multi-family
+            - Single-family
         time_zone:
           type: string
         zipcode:
@@ -2150,6 +2160,27 @@ paths:
         - authenticated
         - locations
       operationId: getMonitoring
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: The location's pro monitoring.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProMonitoring'
+      security:
+        - jwt: []
+    put:
+      tags:
+        - authenticated
+        - locations
+      operationId: updateMonitoring
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProMonitoring'
       responses:
         default:
           $ref: '#/components/responses/ErrorResponse'
