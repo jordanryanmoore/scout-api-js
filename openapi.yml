@@ -1027,6 +1027,14 @@ components:
         - arming
         - disarm
 
+    MonitoringAgreement:
+      required:
+        - url
+      properties:
+        url:
+          type: string
+          format: uri
+
     MotionSensorState:
       type: string
       enum:
@@ -2084,6 +2092,26 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Mode'
+      security:
+        - jwt: []
+
+  /locations/{location_id}/monitoring_agreement:
+    parameters:
+      - $ref: '#/components/parameters/LocationId'
+    get:
+      tags:
+        - authenticated
+        - locations
+      operationId: getEmbeddedContract
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: The location's monitoring agreement.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MonitoringAgreement'
       security:
         - jwt: []
 
