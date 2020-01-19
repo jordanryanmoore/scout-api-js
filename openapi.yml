@@ -936,20 +936,23 @@ components:
         phone_number:
           type: string
         notifications:
-          required:
-            - alarm_state_change
-            - lost_sensor
-            - power_outage
-          properties:
-            alarm_state_change:
-              type: boolean
-            lost_sensor:
-              type: boolean
-            power_outage:
-              type: boolean
+          $ref: '#/components/schemas/MemberNotifications'
         updated:
           type: string
           format: date-time
+
+    MemberNotifications:
+      required:
+        - alarm_state_change
+        - lost_sensor
+        - power_outage
+      properties:
+        alarm_state_change:
+          type: boolean
+        lost_sensor:
+          type: boolean
+        power_outage:
+          type: boolean
 
     Mode:
       required:
@@ -2253,6 +2256,47 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Location'
+      security:
+        - jwt: []
+
+  /members/{member_id}/notifications:
+    parameters:
+      - $ref: '#/components/parameters/MemberId'
+    get:
+      tags:
+        - authenticated
+        - members
+      operationId: getNotifications
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: The member's notifications.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemberNotifications'
+      security:
+        - jwt: []
+    put:
+      tags:
+        - authenticated
+        - members
+      operationId: updateNotifications
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MemberNotifications'
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+        200:
+          description: The member's notifications.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemberNotifications'
       security:
         - jwt: []
 
