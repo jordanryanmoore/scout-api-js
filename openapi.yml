@@ -361,22 +361,15 @@ components:
           readOnly: true
 
     DeviceAlarmEvent:
-      required:
-        - device_id
-        - event
-      properties:
-        affector:
-          $ref: '#/components/schemas/Affector'
-        device_id:
-          type: string
-        event:
-          $ref: '#/components/schemas/DeviceAlarmEventType'
-
-    DeviceAlarmEventType:
-      type: string
-      enum:
-        - alarmed
-        - dismissed
+      allOf:
+        - required:
+            - device_id
+          properties:
+            affector:
+              $ref: '#/components/schemas/Affector'
+            device_id:
+              type: string
+        - $ref: '#/components/schemas/DeviceEvent'
 
     DeviceBatteryReport:
       required:
@@ -389,6 +382,21 @@ components:
           type: string
           format: date-time
           nullable: true
+
+    DeviceEvent:
+      required:
+        - event
+      properties:
+        event:
+          $ref: '#/components/schemas/DeviceEventType'
+      discriminator:
+        propertyName: event
+        mapping:
+          alarmed: '#/components/schemas/DeviceAlarmEvent'
+          dismissed: '#/components/schemas/DeviceAlarmEvent'
+          paired: '#/components/schemas/DevicePairEvent'
+          triggered: '#/components/schemas/DeviceTriggerEvent'
+          unpaired: '#/components/schemas/DevicePairEvent'
 
     DeviceEventType:
       type: string
@@ -432,6 +440,11 @@ components:
         location_id:
           type: string
           writeOnly: true
+
+    DevicePairEvent:
+      allOf:
+        - $ref: '#/components/schemas/Device'
+        - $ref: '#/components/schemas/DeviceEvent'
 
     DeviceReport:
       readOnly: true
@@ -479,6 +492,11 @@ components:
       properties:
         test:
           type: boolean
+
+    DeviceTriggerEvent:
+      allOf:
+        - $ref: '#/components/schemas/Device'
+        - $ref: '#/components/schemas/DeviceEvent'
 
     DeviceTriggerReport:
       properties:
