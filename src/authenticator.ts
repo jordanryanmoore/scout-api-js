@@ -56,7 +56,7 @@ export class AuthenticatorFactory {
                 }
     
                 if (false !== interval) {
-                    setInterval(refresh, interval);
+                    timeout = setInterval(refresh, interval);
                 }
             },
         };
