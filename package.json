@@ -11,6 +11,7 @@
     "clean": "rm -rf generated-src/** lib/**",
     "generate": "openapi-generator generate -i openapi.yml -g typescript-axios -o generated-src/ -c openapi.config.yml",
     "test": "jest",
+    "test-integ": "jest -c jest-integ.config.js",
     "compile": "tsc",
     "build": "npm test && npm run lint && npm run compile",
     "release": "npm run clean && npm run generate && npm run build",
