@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "clean": "rm -rf generated-src/** lib/**",
-    "generate": "openapi-generator generate -i openapi.yml -g typescript-axios -o generated-src/",
+    "generate": "openapi-generator generate -i openapi.yml -g typescript-axios -o generated-src/ -c openapi.config.yml",
     "test": "jest",
     "compile": "tsc",
     "build": "npm test && npm run lint && npm run compile",
