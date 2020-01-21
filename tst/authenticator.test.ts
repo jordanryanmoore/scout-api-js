@@ -1,4 +1,4 @@
-import { UnauthenticatedApi, Session, LoginRequest } from "../generated-src";
+import { UnauthenticatedApi, Session, MemberCredentials } from "../generated-src";
 import { AuthenticatorFactory, Payload } from "../src/authenticator";
 import { AxiosPromise, AxiosResponse } from "axios";
 
@@ -29,7 +29,7 @@ describe("Authenticator", () => {
             }, timeout);
         });
     };
-    const mockAuthApi = (login: (request: LoginRequest) => AxiosPromise<Session>): void => {
+    const mockAuthApi = (login: (request: MemberCredentials) => AxiosPromise<Session>): void => {
         UnauthenticatedApiMock.mockImplementation(() => {
             return {
                 login,

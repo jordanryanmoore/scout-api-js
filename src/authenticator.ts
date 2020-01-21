@@ -1,4 +1,4 @@
-import { UnauthenticatedApi, LoginRequest } from "../generated-src";
+import { UnauthenticatedApi, MemberCredentials } from "../generated-src";
 import { decode } from "jsonwebtoken";
 
 export interface Authenticator {
@@ -20,7 +20,7 @@ export class AuthenticatorFactory {
     public constructor(private readonly api: UnauthenticatedApi = new UnauthenticatedApi()) {
     }
 
-    public async create(request: LoginRequest): Promise<Authenticator> {
+    public async create(request: MemberCredentials): Promise<Authenticator> {
         const api = this.api;
         let jwt = (await api.login(request)).data.jwt;
         let error: Error | undefined;
