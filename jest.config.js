@@ -13,4 +13,5 @@ module.exports = {
         "/node_modules/",
         "/generated-src/",
     ],
+    verbose: true,
 };

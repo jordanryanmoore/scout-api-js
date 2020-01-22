@@ -9,4 +9,5 @@ module.exports = {
       "^.+\\.(ts|tsx)$": "ts-jest",
     },
     collectCoverage: false,
+    verbose: true,
 };

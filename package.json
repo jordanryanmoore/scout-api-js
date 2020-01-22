@@ -8,15 +8,16 @@
     "lib/**/*"
   ],
   "scripts": {
-    "clean": "rm -rf generated-src/** lib/**",
+    "pregenerate": "rm -rf generated-src/**",
     "generate": "openapi-generator generate -i openapi.yml -g typescript-axios -o generated-src/ -c openapi.config.yml",
     "test": "jest",
     "test-integ": "jest -c jest-integ.config.js",
+    "precompile": "rm -rf lib/**",
     "compile": "tsc",
-    "build": "npm test && npm run lint && npm run compile",
-    "release": "npm run clean && npm run generate && npm run build",
+    "build": "run-s generate lint compile",
     "lint": "eslint src/**/*.ts",
-    "prepare": "npm run release"
+    "prepare": "run-s build test",
+    "prepublishOnly": "run-s test-integ"
   },
   "repository": {
     "type": "git",
@@ -39,6 +40,7 @@
     "dotenv": "^8.2.0",
     "eslint": "^6.8.0",
     "jest": "^24.9.0",
+    "npm-run-all": "^4.1.5",
     "prettier": "^1.19.1",
     "ts-jest": "^24.3.0",
     "typescript": "^3.7.4"
