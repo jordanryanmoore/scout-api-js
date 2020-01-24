@@ -50,6 +50,14 @@ export class LocationListener {
         this.pusher.connection.bind(CONNECTION_STATE_EVENT, event => this.emitConnectionStateEvent(event));
     }
 
+    public connect(): void {
+        this.pusher.connect();
+    }
+
+    public disconnect(): void {
+        this.pusher.disconnect();
+    }
+
     public addConnectionStateListener(listener: EventListener<ConnectionStateEvent>): void {
         this.eventEmitter.addListener(ListenerType.ConnectionState, listener);
     }

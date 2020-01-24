@@ -44,7 +44,27 @@ describe("LocationListener", () => {
         });
     });
 
-    test("connectionStateListener", async () => {
+    test("connect()", () => {
+        pusher.connect = jest.fn().mockImplementation();
+
+        const locationListener = new LocationListener(authenticator);
+
+        locationListener.connect();
+
+        expect(pusher.connect).toBeCalledTimes(1);
+    });
+
+    test("disconnect()", () => {
+        pusher.disconnect = jest.fn().mockImplementation();
+
+        const locationListener = new LocationListener(authenticator);
+
+        locationListener.disconnect();
+
+        expect(pusher.disconnect).toBeCalledTimes(1);
+    });
+
+    test("*ConnectionStateListener()", async () => {
         const expectedEvent: ConnectionStateEvent = {
             previous: ConnectionState.Connecting,
             current: ConnectionState.Connected,
@@ -72,7 +92,7 @@ describe("LocationListener", () => {
         expect(clientListener).toHaveBeenCalledWith(expectedEvent);
     });
 
-    describe("location-based events", () => {
+    describe("Location-Based Events", () => {
         let locationListener: LocationListener;
         let channel: Pusher.Channel;
 
@@ -97,7 +117,7 @@ describe("LocationListener", () => {
             });
         });
 
-        test("deviceAlarmEventListener", async () => {
+        test("*DeviceAlarmEventListener()", async () => {
             const expectedEvent = {
                 // eslint-disable-next-line @typescript-eslint/camelcase
                 device_id: "device1",
@@ -122,7 +142,7 @@ describe("LocationListener", () => {
             expect(clientListener).toHaveBeenCalledWith(expectedEvent, LOCATION_ID);
         });
 
-        test("devicePairEventListener", async () => {
+        test("*DevicePairEventListener()", async () => {
             const expectedEvent = {
                 id: "device1",
                 event: DeviceEventType.Paired,
@@ -146,7 +166,7 @@ describe("LocationListener", () => {
             expect(clientListener).toHaveBeenCalledWith(expectedEvent, LOCATION_ID);
         });
 
-        test("deviceTriggerEventListener", async () => {
+        test("*DeviceTriggerEventListener()", async () => {
             const expectedEvent = {
                 id: "device1",
                 event: DeviceEventType.Triggered,
@@ -170,7 +190,7 @@ describe("LocationListener", () => {
             expect(clientListener).toHaveBeenCalledWith(expectedEvent, LOCATION_ID);
         });
 
-        test("hubEventListener", async () => {
+        test("*HubEventListener()", async () => {
             const expectedEvent = {
                 id: "test",
             } as Hub;
@@ -193,7 +213,7 @@ describe("LocationListener", () => {
             expect(clientListener).toHaveBeenCalledWith(expectedEvent, LOCATION_ID);
         });
 
-        test("modeEventListener", async () => {
+        test("*ModeEventListener()", async () => {
             const expectedEvent = {
                 // eslint-disable-next-line @typescript-eslint/camelcase
                 mode_id: "mode1",
@@ -218,7 +238,7 @@ describe("LocationListener", () => {
             expect(clientListener).toHaveBeenCalledWith(expectedEvent, LOCATION_ID);
         });
 
-        test("rfidEventListener", async () => {
+        test("*RfidEventListener()", async () => {
             const expectedEvent = {
                 token: "rfid1",
                 event: RfidEventType.Swiped,
