@@ -45,13 +45,23 @@ describe("LocationListener", () => {
     });
 
     test("connect()", () => {
+        const nextToken = "token2";
+
         pusher.connect = jest.fn().mockImplementation();
+        pusher.config = {};
 
         const locationListener = new LocationListener(authenticator);
+
+        authenticator.getToken = (): string => nextToken;
 
         locationListener.connect();
 
         expect(pusher.connect).toBeCalledTimes(1);
+        expect(pusher.config.auth).toMatchObject({
+            headers: {
+                Authorization: nextToken,
+            }
+        });
     });
 
     test("disconnect()", () => {

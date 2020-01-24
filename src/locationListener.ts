@@ -37,20 +37,18 @@ export class LocationListener {
     private readonly eventEmitter = new EventEmitter();
     private readonly pusher: Pusher.Pusher;
 
-    public constructor(authenticator: Authenticator) {
+    public constructor(private readonly authenticator: Authenticator) {
         this.pusher = new Pusher(API_KEY, {
             authEndpoint: AUTH_ENDPOINT,
-            auth: {
-                headers: {
-                    Authorization: authenticator.getToken(),
-                },
-            },
+            auth: this.getAuthConfig(),
         });
 
         this.pusher.connection.bind(CONNECTION_STATE_EVENT, event => this.emitConnectionStateEvent(event));
     }
 
     public connect(): void {
+        this.pusher.config.auth = this.getAuthConfig();
+
         this.pusher.connect();
     }
 
@@ -112,6 +110,14 @@ export class LocationListener {
 
     public removeRfidListener(locationId: string, listener: EventListener<RfidEvent>): void {
         this.removeLocationListener(locationId, ListenerType.Rfid, listener);
+    }
+
+    private getAuthConfig(): Pusher.AuthConfig {
+        return {
+            headers: {
+                Authorization: this.authenticator.getToken(),
+            },
+        };
     }
 
     private addLocationListener<T>(locationId: string, type: ListenerType, listener: EventListener<T>): void {
