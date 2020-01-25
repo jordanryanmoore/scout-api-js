@@ -32,7 +32,7 @@
   "devDependencies": {
     "@openapitools/openapi-generator-cli": "^1.0.8-4.2.2",
     "@types/axios": "^0.14.0",
-    "@types/jest": "^24.9.0",
+    "@types/jest": "^24.9.1",
     "@types/jsonwebtoken": "^8.3.7",
     "@types/pusher-js": "^4.2.2",
     "@typescript-eslint/eslint-plugin": "^2.17.0",
