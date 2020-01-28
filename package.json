@@ -50,5 +50,8 @@
     "axios": "^0.19.2",
     "jsonwebtoken": "^8.5.1",
     "pusher-js": "^5.0.3"
+  },
+  "engines": {
+    "node": ">=8.0"
   }
 }
