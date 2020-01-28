@@ -1764,144 +1764,168 @@ components:
 
   requestBodies:
     BillingToken:
+      required: true
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/BillingToken'
 
     Coupon:
+      required: true
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Coupon'
 
     DevicePairing:
+      required: true
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/DevicePairing'
 
     HubChirp:
+      required: true
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/HubChirp'
 
     HubSiren:
+      required: true
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/HubSiren'
 
     LocationMemberStateUpdate:
+      required: true
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/LocationMemberStateUpdate'
 
     MemberCredentials:
+      required: true
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/MemberCredentials'
 
     MemberEmail:
+      required: true
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/MemberEmail'
 
     MemberNotifications:
+      required: true
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/MemberNotifications'
 
     Mode:
+      required: true
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Mode'
 
     ModeEmailReaction:
+      required: true
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ModeEmailReaction'
 
     ModeEntryDelayReaction:
+      required: true
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ModeEntryDelayReaction'
 
     ModeStateUpdate:
+      required: true
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ModeStateUpdate'
 
     NewLocationMember:
+      required: true
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/NewLocationMember'
 
     NewMember:
+      required: true
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/NewMember'
 
     NewMemberEmail:
+      required: true
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/NewMemberEmail'
 
     NewMemberPassword:
+      required: true
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/NewMemberPassword'
 
     NewMode:
+      required: true
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/NewMode'
 
     NewUserCode:
+      required: true
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/NewUserCode'
 
     PasswordReset:
+      required: true
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/PasswordReset'
 
     ProMonitoring:
+      required: true
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ProMonitoring'
 
     Rfid:
+      required: true
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Rfid'
 
     UserCode:
+      required: true
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/UserCode'
 
     ZWaveSettings:
+      required: true
       content:
         application/json:
           schema:
