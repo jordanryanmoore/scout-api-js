@@ -44,6 +44,14 @@ describe("LocationListener", () => {
         });
     });
 
+    test("getConnectionState()", () => {
+        pusher.connection.state = ConnectionState.Connecting;
+
+        const locationListener = new LocationListener(authenticator);
+
+        expect(locationListener.getConnectionState()).toEqual(ConnectionState.Connecting);
+    });
+
     test("connect()", () => {
         const nextToken = "token2";
 

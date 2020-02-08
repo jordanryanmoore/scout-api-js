@@ -8,7 +8,9 @@ const API_KEY = "baf06f5a867d462e09d4";
 const AUTH_ENDPOINT = BASE_PATH + "/auth/pusher";
 const CONNECTION_STATE_EVENT = "state_change";
 
-type EventListener<T> = (event: T, locationId: string) => void;
+type EventListener<T> = (event: T) => void;
+
+type LocationEventListener<T> = (event: T, locationId: string) => void;
 
 enum ListenerType {
     ConnectionState = "connection_state",
@@ -46,6 +48,10 @@ export class LocationListener {
         this.pusher.connection.bind(CONNECTION_STATE_EVENT, event => this.emitConnectionStateEvent(event));
     }
 
+    public getConnectionState(): ConnectionState {
+        return this.pusher.connection.state as ConnectionState;
+    }
+
     public connect(): void {
         this.pusher.config.auth = this.getAuthConfig();
 
@@ -64,51 +70,51 @@ export class LocationListener {
         this.eventEmitter.removeListener(ListenerType.ConnectionState, listener);
     }
 
-    public addDeviceAlarmListener(locationId: string, listener: EventListener<DeviceAlarmEvent>): void {
+    public addDeviceAlarmListener(locationId: string, listener: LocationEventListener<DeviceAlarmEvent>): void {
         this.addLocationListener(locationId, ListenerType.DeviceAlarm, listener);
     }
 
-    public removeDeviceAlarmListener(locationId: string, listener: EventListener<DeviceAlarmEvent>): void {
+    public removeDeviceAlarmListener(locationId: string, listener: LocationEventListener<DeviceAlarmEvent>): void {
         this.removeLocationListener(locationId, ListenerType.DeviceAlarm, listener);
     }
 
-    public addDevicePairListener(locationId: string, listener: EventListener<DevicePairEvent>): void {
+    public addDevicePairListener(locationId: string, listener: LocationEventListener<DevicePairEvent>): void {
         this.addLocationListener(locationId, ListenerType.DevicePair, listener);
     }
 
-    public removeDevicePairListener(locationId: string, listener: EventListener<DevicePairEvent>): void {
+    public removeDevicePairListener(locationId: string, listener: LocationEventListener<DevicePairEvent>): void {
         this.removeLocationListener(locationId, ListenerType.DevicePair, listener);
     }
 
-    public addDeviceTriggerListener(locationId: string, listener: EventListener<DeviceTriggerEvent>): void {
+    public addDeviceTriggerListener(locationId: string, listener: LocationEventListener<DeviceTriggerEvent>): void {
         this.addLocationListener(locationId, ListenerType.DeviceTrigger, listener);
     }
 
-    public removeDeviceTriggerListener(locationId: string, listener: EventListener<DeviceTriggerEvent>): void {
+    public removeDeviceTriggerListener(locationId: string, listener: LocationEventListener<DeviceTriggerEvent>): void {
         this.removeLocationListener(locationId, ListenerType.DeviceTrigger, listener);
     }
 
-    public addHubListener(locationId: string, listener: EventListener<Hub>): void {
+    public addHubListener(locationId: string, listener: LocationEventListener<Hub>): void {
         this.addLocationListener(locationId, ListenerType.Hub, listener);
     }
 
-    public removeHubListener(locationId: string, listener: EventListener<Hub>): void {
+    public removeHubListener(locationId: string, listener: LocationEventListener<Hub>): void {
         this.removeLocationListener(locationId, ListenerType.Hub, listener);
     }
 
-    public addModeListener(locationId: string, listener: EventListener<ModeEvent>): void {
+    public addModeListener(locationId: string, listener: LocationEventListener<ModeEvent>): void {
         this.addLocationListener(locationId, ListenerType.Mode, listener);
     }
 
-    public removeModeListener(locationId: string, listener: EventListener<ModeEvent>): void {
+    public removeModeListener(locationId: string, listener: LocationEventListener<ModeEvent>): void {
         this.removeLocationListener(locationId, ListenerType.Mode, listener);
     }
 
-    public addRfidListener(locationId: string, listener: EventListener<RfidEvent>): void {
+    public addRfidListener(locationId: string, listener: LocationEventListener<RfidEvent>): void {
         this.addLocationListener(locationId, ListenerType.Rfid, listener);
     }
 
-    public removeRfidListener(locationId: string, listener: EventListener<RfidEvent>): void {
+    public removeRfidListener(locationId: string, listener: LocationEventListener<RfidEvent>): void {
         this.removeLocationListener(locationId, ListenerType.Rfid, listener);
     }
 
@@ -120,7 +126,7 @@ export class LocationListener {
         };
     }
 
-    private addLocationListener<T>(locationId: string, type: ListenerType, listener: EventListener<T>): void {
+    private addLocationListener<T>(locationId: string, type: ListenerType, listener: LocationEventListener<T>): void {
         const channelName = `private-${locationId}`;
         let channel = this.pusher.channel(channelName);
 
@@ -136,7 +142,7 @@ export class LocationListener {
         this.eventEmitter.addListener(`${locationId}:${type}`, listener);
     }
 
-    private removeLocationListener<T>(locationId: string, type: ListenerType, listener: EventListener<T>): void {
+    private removeLocationListener<T>(locationId: string, type: ListenerType, listener: LocationEventListener<T>): void {
         this.eventEmitter.removeListener(`${locationId}:${type}`, listener);
 
         // TODO: Unsubscribe from the channel if there are no more listeners.
