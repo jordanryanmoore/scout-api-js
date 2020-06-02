@@ -1,6 +1,7 @@
 import { ConnectionStateEvent, LocationListener, ConnectionState, Hub, ModeEvent, ModeState, RfidEvent, RfidEventType, DeviceAlarmEvent, DeviceEventType, DevicePairEvent, DeviceTriggerEvent } from "../src";
 import { Authenticator } from "../src/authenticator";
-import * as Pusher from "pusher-js";
+import Pusher from "pusher-js";
+import * as PusherTypes from "pusher-js";
 
 const TOKEN = "token1";
 const LOCATION_ID = "location1";
@@ -11,27 +12,27 @@ jest.mock("pusher-js");
 describe("LocationListener", () => {
     const MockPusher = (Pusher as unknown as jest.Mock);
     let authenticator: Authenticator;
-    let pusher: Pusher.Pusher;
+    let pusher: Pusher;
 
     beforeEach(() => {
         authenticator = {
             getToken: () => TOKEN,
         } as Authenticator;
 
-        pusher = {} as Pusher.Pusher;
+        pusher = {} as Pusher;
 
-        pusher.connection = {} as Pusher.ConnectionManager;
+        pusher.connection = {} as PusherTypes.ConnectionManager;
 
-        pusher.connection.bind = jest.fn().mockImplementation((event: string, callback: Pusher.EventCallback): Pusher.ConnectionManager => {
+        pusher.connection.bind = jest.fn().mockImplementation((event: string, callback: Function): PusherTypes.ConnectionManager => {
             return pusher.connection;
         });
 
-        pusher.bind = jest.fn().mockImplementation((event: string, callback: Pusher.EventCallback): Pusher.Pusher => {
+        pusher.bind = jest.fn().mockImplementation((event: string, callback: Function): Pusher => {
             return pusher;
         });
 
         MockPusher.mockClear();
-        MockPusher.mockImplementationOnce((apiKey: string, config: Pusher.Config) => {
+        MockPusher.mockImplementationOnce((apiKey: string, config: PusherTypes.Options) => {
             expect(apiKey).toBeDefined();
             expect(config.authEndpoint).toBeDefined();
             expect(config.auth).toMatchObject({
@@ -56,7 +57,7 @@ describe("LocationListener", () => {
         const nextToken = "token2";
 
         pusher.connect = jest.fn().mockImplementation();
-        pusher.config = {};
+        (pusher.config as unknown) = {};
 
         const locationListener = new LocationListener(authenticator);
 
@@ -93,7 +94,7 @@ describe("LocationListener", () => {
         });
 
         const locationListener = new LocationListener(authenticator);
-        const connectionListener = (pusher.connection.bind as jest.Mock<Pusher.ConnectionManager>).mock.calls[0][1];
+        const connectionListener = (pusher.connection.bind as jest.Mock<PusherTypes.ConnectionManager>).mock.calls[0][1];
 
         locationListener.addConnectionStateListener(clientListener);
 
@@ -112,25 +113,25 @@ describe("LocationListener", () => {
 
     describe("Location-Based Events", () => {
         let locationListener: LocationListener;
-        let channel: Pusher.Channel;
+        let channel: PusherTypes.Channel;
 
         beforeEach(() => {
             locationListener = new LocationListener(authenticator);
-            channel = {} as Pusher.Channel;
+            channel = {} as PusherTypes.Channel;
 
-            pusher.channel = jest.fn().mockImplementationOnce((name: string): Pusher.Channel | undefined => {
+            pusher.channel = jest.fn().mockImplementationOnce((name: string): PusherTypes.Channel | undefined => {
                 expect(name).toEqual(CHANNEL_NAME);
 
                 return undefined;
             });
 
-            pusher.subscribe = jest.fn().mockImplementationOnce((name: string): Pusher.Channel => {
+            pusher.subscribe = jest.fn().mockImplementationOnce((name: string): PusherTypes.Channel => {
                 expect(name).toEqual(CHANNEL_NAME);
 
                 return channel;
             });
 
-            channel.bind = jest.fn().mockImplementation((eventName: string, callback: Pusher.EventCallback, context?: any) => {
+            channel.bind = jest.fn().mockImplementation((eventName: string, callback: Function, context?: any) => {
                 return channel;
             });
         });
@@ -148,7 +149,7 @@ describe("LocationListener", () => {
 
             locationListener.addDeviceAlarmListener(LOCATION_ID, clientListener);
 
-            const deviceListener = ((channel.bind as jest.Mock<Pusher.Channel>).mock.calls.find(call => call[0] == "device")[1]);
+            const deviceListener = ((channel.bind as jest.Mock<PusherTypes.Channel>).mock.calls.find(call => call[0] == "device")[1]);
 
             deviceListener(expectedEvent);
 
@@ -172,7 +173,7 @@ describe("LocationListener", () => {
 
             locationListener.addDevicePairListener(LOCATION_ID, clientListener);
 
-            const deviceListener = ((channel.bind as jest.Mock<Pusher.Channel>).mock.calls.find(call => call[0] == "device")[1]);
+            const deviceListener = ((channel.bind as jest.Mock<PusherTypes.Channel>).mock.calls.find(call => call[0] == "device")[1]);
 
             deviceListener(expectedEvent);
 
@@ -196,7 +197,7 @@ describe("LocationListener", () => {
 
             locationListener.addDeviceTriggerListener(LOCATION_ID, clientListener);
 
-            const deviceListener = ((channel.bind as jest.Mock<Pusher.Channel>).mock.calls.find(call => call[0] == "device")[1]);
+            const deviceListener = ((channel.bind as jest.Mock<PusherTypes.Channel>).mock.calls.find(call => call[0] == "device")[1]);
 
             deviceListener(expectedEvent);
 
@@ -219,7 +220,7 @@ describe("LocationListener", () => {
 
             locationListener.addHubListener(LOCATION_ID, clientListener);
 
-            const hubListener = ((channel.bind as jest.Mock<Pusher.Channel>).mock.calls.find(call => call[0] == "hub")[1]);
+            const hubListener = ((channel.bind as jest.Mock<PusherTypes.Channel>).mock.calls.find(call => call[0] == "hub")[1]);
 
             hubListener(expectedEvent);
 
@@ -244,7 +245,7 @@ describe("LocationListener", () => {
 
             locationListener.addModeListener(LOCATION_ID, clientListener);
 
-            const modeListener = ((channel.bind as jest.Mock<Pusher.Channel>).mock.calls.find(call => call[0] == "mode")[1]);
+            const modeListener = ((channel.bind as jest.Mock<PusherTypes.Channel>).mock.calls.find(call => call[0] == "mode")[1]);
 
             modeListener(expectedEvent);
 
@@ -268,7 +269,7 @@ describe("LocationListener", () => {
 
             locationListener.addRfidListener(LOCATION_ID, clientListener);
 
-            const rfidListener = ((channel.bind as jest.Mock<Pusher.Channel>).mock.calls.find(call => call[0] == "rfid")[1]);
+            const rfidListener = ((channel.bind as jest.Mock<PusherTypes.Channel>).mock.calls.find(call => call[0] == "rfid")[1]);
 
             rfidListener(expectedEvent);
 

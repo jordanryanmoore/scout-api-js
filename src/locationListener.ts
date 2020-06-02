@@ -2,7 +2,8 @@ import { DeviceAlarmEvent, EventType, DeviceEventType, ModeEvent, Hub, RfidEvent
 import { BASE_PATH } from "../generated-src/base";
 import { Authenticator } from "./authenticator";
 import { EventEmitter } from "events";
-import * as Pusher from "pusher-js";
+import Pusher from 'pusher-js';
+import * as PusherTypes from 'pusher-js';
 
 const API_KEY = "baf06f5a867d462e09d4";
 const AUTH_ENDPOINT = BASE_PATH + "/auth/pusher";
@@ -37,7 +38,7 @@ export interface ConnectionStateEvent {
 
 export class LocationListener {
     private readonly eventEmitter = new EventEmitter();
-    private readonly pusher: Pusher.Pusher;
+    private readonly pusher: Pusher;
 
     public constructor(private readonly authenticator: Authenticator) {
         this.pusher = new Pusher(API_KEY, {
@@ -45,7 +46,7 @@ export class LocationListener {
             auth: this.getAuthConfig(),
         });
 
-        this.pusher.connection.bind(CONNECTION_STATE_EVENT, event => this.emitConnectionStateEvent(event));
+        this.pusher.connection.bind(CONNECTION_STATE_EVENT, (event: ConnectionStateEvent) => this.emitConnectionStateEvent(event));
     }
 
     public getConnectionState(): ConnectionState {
@@ -118,7 +119,7 @@ export class LocationListener {
         this.removeLocationListener(locationId, ListenerType.Rfid, listener);
     }
 
-    private getAuthConfig(): Pusher.AuthConfig {
+    private getAuthConfig(): PusherTypes.AuthOptions {
         return {
             headers: {
                 Authorization: this.authenticator.getToken(),
@@ -133,10 +134,10 @@ export class LocationListener {
         if (!channel) {
             channel = this.pusher.subscribe(channelName);
 
-            channel.bind(EventType.Device, event => this.emitDeviceEvent(locationId, event));
-            channel.bind(EventType.Hub, event => this.emit(locationId, ListenerType.Hub, event));
-            channel.bind(EventType.Mode, event => this.emit(locationId, ListenerType.Mode, event));
-            channel.bind(EventType.Rfid, event => this.emit(locationId, ListenerType.Rfid, event));
+            channel.bind(EventType.Device, (event: DeviceEvent) => this.emitDeviceEvent(locationId, event));
+            channel.bind(EventType.Hub, (event: Hub) => this.emit(locationId, ListenerType.Hub, event));
+            channel.bind(EventType.Mode, (event: ModeEvent) => this.emit(locationId, ListenerType.Mode, event));
+            channel.bind(EventType.Rfid, (event: RfidEvent) => this.emit(locationId, ListenerType.Rfid, event));
         }
 
         this.eventEmitter.addListener(`${locationId}:${type}`, listener);
