@@ -1,4 +1,4 @@
-import { AuthenticatorFactory, LocationListener, ConnectionState, Authenticator } from "../src";
+import { AuthenticatorFactory, LocationListener, ConnectionState, Authenticator, LocationEventType } from "../src";
 import { config as configDotEnv } from "dotenv";
 
 configDotEnv();
@@ -21,9 +21,9 @@ describe("LocationListener", () => {
         locationListener = new LocationListener(authenticator);
     });
 
-    test("*ConnectionStateListener()", async () => {
+    test("on(ConnectionState)", async () => {
         return new Promise((resolve, reject) => {
-            locationListener.addConnectionStateListener(event => {
+            locationListener.on(LocationEventType.ConnectionState, event => {
                 try {
                     expect(event.previous).toEqual(ConnectionState.Connecting);
                     expect(event.current).toEqual(ConnectionState.Connected);

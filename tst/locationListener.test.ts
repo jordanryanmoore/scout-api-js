@@ -1,4 +1,4 @@
-import { ConnectionStateEvent, LocationListener, ConnectionState, Hub, ModeEvent, ModeState, RfidEvent, RfidEventType, DeviceAlarmEvent, DeviceEventType, DevicePairEvent, DeviceTriggerEvent } from "../src";
+import { ConnectionStateEvent, LocationListener, ConnectionState, Hub, ModeEvent, ModeState, RfidEvent, RfidEventType, DeviceAlarmEvent, DeviceEventType, DevicePairEvent, DeviceTriggerEvent, LocationEventType } from "../src";
 import { Authenticator } from "../src/authenticator";
 import Pusher from "pusher-js";
 import * as PusherTypes from "pusher-js";
@@ -83,35 +83,7 @@ describe("LocationListener", () => {
         expect(pusher.disconnect).toBeCalledTimes(1);
     });
 
-    test("*ConnectionStateListener()", async () => {
-        const expectedEvent: ConnectionStateEvent = {
-            previous: ConnectionState.Connecting,
-            current: ConnectionState.Connected,
-        };
-
-        const clientListener = jest.fn().mockImplementationOnce((event) => {
-            return;
-        });
-
-        const locationListener = new LocationListener(authenticator);
-        const connectionListener = (pusher.connection.bind as jest.Mock<PusherTypes.ConnectionManager>).mock.calls[0][1];
-
-        locationListener.addConnectionStateListener(clientListener);
-
-        connectionListener(expectedEvent);
-
-        locationListener.removeConnectionStateListener(clientListener);
-
-        connectionListener(expectedEvent);
-
-        expect(pusher.connection.bind).toHaveBeenCalledTimes(1);
-        expect(pusher.connection.bind).toHaveBeenCalledWith("state_change", connectionListener);
-
-        expect(clientListener).toHaveBeenCalledTimes(1);
-        expect(clientListener).toHaveBeenCalledWith(expectedEvent);
-    });
-
-    describe("Location-Based Events", () => {
+    describe("on(…, …)", () => {
         let locationListener: LocationListener;
         let channel: PusherTypes.Channel;
 
@@ -136,7 +108,34 @@ describe("LocationListener", () => {
             });
         });
 
-        test("*DeviceAlarmEventListener()", async () => {
+        test("with ConnectionState event", async () => {
+            const expectedEvent: ConnectionStateEvent = {
+                previous: ConnectionState.Connecting,
+                current: ConnectionState.Connected,
+            };
+    
+            const clientListener = jest.fn().mockImplementationOnce((event) => {
+                return;
+            });
+    
+            const connectionListener = (pusher.connection.bind as jest.Mock<PusherTypes.ConnectionManager>).mock.calls[0][1];
+    
+            locationListener.on(LocationEventType.ConnectionState, clientListener);
+    
+            connectionListener(expectedEvent);
+    
+            locationListener.off(LocationEventType.ConnectionState, clientListener);
+    
+            connectionListener(expectedEvent);
+    
+            expect(pusher.connection.bind).toHaveBeenCalledTimes(1);
+            expect(pusher.connection.bind).toHaveBeenCalledWith("state_change", connectionListener);
+    
+            expect(clientListener).toHaveBeenCalledTimes(1);
+            expect(clientListener).toHaveBeenCalledWith(expectedEvent);
+        });
+
+        test("with DeviceAlarm event", async () => {
             const expectedEvent = {
                 // eslint-disable-next-line @typescript-eslint/camelcase
                 device_id: "device1",
@@ -147,13 +146,14 @@ describe("LocationListener", () => {
                 return;
             });
 
-            locationListener.addDeviceAlarmListener(LOCATION_ID, clientListener);
+            locationListener.addLocation(LOCATION_ID);
+            locationListener.on(LocationEventType.DeviceAlarm, clientListener);
 
             const deviceListener = ((channel.bind as jest.Mock<PusherTypes.Channel>).mock.calls.find(call => call[0] == "device")[1]);
 
             deviceListener(expectedEvent);
 
-            locationListener.removeDeviceAlarmListener(LOCATION_ID, clientListener);
+            locationListener.off(LocationEventType.DeviceAlarm, clientListener);
 
             deviceListener(expectedEvent);
 
@@ -161,7 +161,7 @@ describe("LocationListener", () => {
             expect(clientListener).toHaveBeenCalledWith(expectedEvent, LOCATION_ID);
         });
 
-        test("*DevicePairEventListener()", async () => {
+        test("with DevicePair event", async () => {
             const expectedEvent = {
                 id: "device1",
                 event: DeviceEventType.Paired,
@@ -171,13 +171,14 @@ describe("LocationListener", () => {
                 return;
             });
 
-            locationListener.addDevicePairListener(LOCATION_ID, clientListener);
+            locationListener.addLocation(LOCATION_ID);
+            locationListener.on(LocationEventType.DevicePair, clientListener);
 
             const deviceListener = ((channel.bind as jest.Mock<PusherTypes.Channel>).mock.calls.find(call => call[0] == "device")[1]);
 
             deviceListener(expectedEvent);
 
-            locationListener.removeDevicePairListener(LOCATION_ID, clientListener);
+            locationListener.off(LocationEventType.DevicePair, clientListener);
 
             deviceListener(expectedEvent);
 
@@ -185,7 +186,7 @@ describe("LocationListener", () => {
             expect(clientListener).toHaveBeenCalledWith(expectedEvent, LOCATION_ID);
         });
 
-        test("*DeviceTriggerEventListener()", async () => {
+        test("with DeviceTrigger event", async () => {
             const expectedEvent = {
                 id: "device1",
                 event: DeviceEventType.Triggered,
@@ -195,13 +196,14 @@ describe("LocationListener", () => {
                 return;
             });
 
-            locationListener.addDeviceTriggerListener(LOCATION_ID, clientListener);
+            locationListener.addLocation(LOCATION_ID);
+            locationListener.on(LocationEventType.DeviceTrigger, clientListener);
 
             const deviceListener = ((channel.bind as jest.Mock<PusherTypes.Channel>).mock.calls.find(call => call[0] == "device")[1]);
 
             deviceListener(expectedEvent);
 
-            locationListener.removeDeviceTriggerListener(LOCATION_ID, clientListener);
+            locationListener.off(LocationEventType.DeviceTrigger, clientListener);
 
             deviceListener(expectedEvent);
 
@@ -209,7 +211,7 @@ describe("LocationListener", () => {
             expect(clientListener).toHaveBeenCalledWith(expectedEvent, LOCATION_ID);
         });
 
-        test("*HubEventListener()", async () => {
+        test("with Hub event", async () => {
             const expectedEvent = {
                 id: "test",
             } as Hub;
@@ -218,13 +220,14 @@ describe("LocationListener", () => {
                 return;
             });
 
-            locationListener.addHubListener(LOCATION_ID, clientListener);
+            locationListener.addLocation(LOCATION_ID);
+            locationListener.on(LocationEventType.Hub, clientListener);
 
             const hubListener = ((channel.bind as jest.Mock<PusherTypes.Channel>).mock.calls.find(call => call[0] == "hub")[1]);
 
             hubListener(expectedEvent);
 
-            locationListener.removeHubListener(LOCATION_ID, clientListener);
+            locationListener.off(LocationEventType.Hub, clientListener);
 
             hubListener(expectedEvent);
 
@@ -232,7 +235,7 @@ describe("LocationListener", () => {
             expect(clientListener).toHaveBeenCalledWith(expectedEvent, LOCATION_ID);
         });
 
-        test("*ModeEventListener()", async () => {
+        test("with Mode event", async () => {
             const expectedEvent = {
                 // eslint-disable-next-line @typescript-eslint/camelcase
                 mode_id: "mode1",
@@ -243,13 +246,14 @@ describe("LocationListener", () => {
                 return;
             });
 
-            locationListener.addModeListener(LOCATION_ID, clientListener);
+            locationListener.addLocation(LOCATION_ID);
+            locationListener.on(LocationEventType.Mode, clientListener);
 
             const modeListener = ((channel.bind as jest.Mock<PusherTypes.Channel>).mock.calls.find(call => call[0] == "mode")[1]);
 
             modeListener(expectedEvent);
 
-            locationListener.removeModeListener(LOCATION_ID, clientListener);
+            locationListener.off(LocationEventType.Mode, clientListener);
 
             modeListener(expectedEvent);
 
@@ -257,7 +261,7 @@ describe("LocationListener", () => {
             expect(clientListener).toHaveBeenCalledWith(expectedEvent, LOCATION_ID);
         });
 
-        test("*RfidEventListener()", async () => {
+        test("with Rfid event", async () => {
             const expectedEvent = {
                 token: "rfid1",
                 event: RfidEventType.Swiped,
@@ -267,13 +271,14 @@ describe("LocationListener", () => {
                 return;
             });
 
-            locationListener.addRfidListener(LOCATION_ID, clientListener);
+            locationListener.addLocation(LOCATION_ID);
+            locationListener.on(LocationEventType.Rfid, clientListener);
 
             const rfidListener = ((channel.bind as jest.Mock<PusherTypes.Channel>).mock.calls.find(call => call[0] == "rfid")[1]);
 
             rfidListener(expectedEvent);
 
-            locationListener.removeRfidListener(LOCATION_ID, clientListener);
+            locationListener.off(LocationEventType.Rfid, clientListener);
 
             rfidListener(expectedEvent);
 
