@@ -1,13 +1,13 @@
-import { UnauthenticatedApi, AuthenticatedApi } from "../src";
+import { UnauthenticatedApi, AuthenticatedApi } from '../src';
 
-test("UnauthenticatedApi", async () => {
+test('UnauthenticatedApi', () => {
     const api = new UnauthenticatedApi();
 
-    expect(api).toHaveProperty("login");
+    expect(api).toHaveProperty('login');
 });
 
-test("AuthenticatedApi", async () => {
+test('AuthenticatedApi', () => {
     const api = new AuthenticatedApi();
 
-    expect(api).toHaveProperty("getLocations");
+    expect(api).toHaveProperty('getLocations');
 });

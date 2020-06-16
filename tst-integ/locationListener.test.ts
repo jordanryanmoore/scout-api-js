@@ -1,9 +1,9 @@
-import { AuthenticatorFactory, LocationListener, ConnectionState, Authenticator, LocationEventType } from "../src";
-import { config as configDotEnv } from "dotenv";
+import { config as configDotEnv } from 'dotenv';
+import { AuthenticatorFactory, LocationListener, ConnectionState, Authenticator, LocationEventType } from '../src';
 
 configDotEnv();
 
-describe("LocationListener", () => {
+describe('LocationListener', () => {
     let authenticator: Authenticator;
     let locationListener: LocationListener;
 
@@ -21,7 +21,7 @@ describe("LocationListener", () => {
         locationListener = new LocationListener(authenticator);
     });
 
-    test("on(ConnectionState)", async () => {
+    test('on(ConnectionState)', async () => {
         return new Promise((resolve, reject) => {
             locationListener.on(LocationEventType.ConnectionState, event => {
                 try {

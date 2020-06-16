@@ -1,9 +1,9 @@
-import { AuthenticatorFactory, MembersApi } from "../src";
-import { config as configDotEnv } from "dotenv";
+import { config as configDotEnv } from 'dotenv';
+import { AuthenticatorFactory, MembersApi } from '../src';
 
 configDotEnv();
 
-test("MembersApi.findMember()", async () => {
+test('MembersApi.findMember()', async () => {
     const email = process.env.SCOUT_EMAIL as string;
     const password = process.env.SCOUT_PASSWORD as string;
     const authenticator = await new AuthenticatorFactory().create({

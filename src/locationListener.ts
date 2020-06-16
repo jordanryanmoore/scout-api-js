@@ -1,34 +1,45 @@
-import { DeviceAlarmEvent, EventType as ScoutEventType, DeviceEventType, ModeEvent, Hub, RfidEvent, DeviceTriggerEvent, DevicePairEvent, DeviceEvent } from "../generated-src";
-import { BASE_PATH } from "../generated-src/base";
-import { Authenticator } from "./authenticator";
-import { EventEmitter } from "events";
-import Pusher from 'pusher-js';
+import { EventEmitter } from 'events';
 import * as PusherTypes from 'pusher-js';
+import Pusher from 'pusher-js';
+import {
+    DeviceAlarmEvent,
+    EventType as ScoutEventType,
+    DeviceEventType,
+    ModeEvent,
+    Hub,
+    RfidEvent,
+    DeviceTriggerEvent,
+    DevicePairEvent,
+    DeviceEvent,
+} from '../generated-src';
+import { BASE_PATH } from '../generated-src/base';
+import { Authenticator } from './authenticator';
 
-const API_KEY = "baf06f5a867d462e09d4";
-const AUTH_ENDPOINT = BASE_PATH + "/auth/pusher";
-const CONNECTION_STATE_EVENT = "state_change";
+const API_KEY = 'baf06f5a867d462e09d4';
+const AUTH_ENDPOINT = BASE_PATH + '/auth/pusher';
+const CONNECTION_STATE_EVENT = 'state_change';
 
 type EventListener<T> = (event: T) => void;
 
 type LocationEventListener<T> = (event: T, locationId: string) => void;
 
 export enum LocationEventType {
-    ConnectionState = "connection_state",
-    DeviceAlarm = "device_alarm",
-    DevicePair = "device_pair",
-    DeviceTrigger = "device_trigger",
-    Hub = "hub",
-    Mode = "mode",
-    Rfid = "rfid",
+    ConnectionState = 'connection_state',
+    DeviceAlarm = 'device_alarm',
+    DevicePair = 'device_pair',
+    DeviceTrigger = 'device_trigger',
+    // eslint-disable-next-line no-shadow
+    Hub = 'hub',
+    Mode = 'mode',
+    Rfid = 'rfid',
 }
 
 export enum ConnectionState {
-    Connecting = "connecting",
-    Connected = "connected",
-    Disconnected = "disconnected",
-    Failed = "failed",
-    Unavailable = "unavailable",
+    Connecting = 'connecting',
+    Connected = 'connected',
+    Disconnected = 'disconnected',
+    Failed = 'failed',
+    Unavailable = 'unavailable',
 }
 
 export interface ConnectionStateEvent {
@@ -120,7 +131,7 @@ export class LocationListener {
         this.eventEmitter.emit(LocationEventType.ConnectionState, event);
     }
 
-    private emitDeviceEvent(event: {event: DeviceEventType}, locationId: string): void {
+    private emitDeviceEvent(event: { event: DeviceEventType }, locationId: string): void {
         switch (event.event) {
             case DeviceEventType.Alarmed:
             case DeviceEventType.Dismissed:
