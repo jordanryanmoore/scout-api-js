@@ -40,8 +40,8 @@ export class AuthenticatorFactory {
 
         return {
             getToken,
-            getPayload: (): Promise<Payload> => {
-                return decode(getToken()) as Payload;
+            getPayload: async (): Promise<Payload> => {
+                return decode(await getToken()) as Payload;
             },
         };
     }
