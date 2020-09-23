@@ -31,7 +31,7 @@ describe('LocationListener', () => {
 
     beforeEach(() => {
         authenticator = {
-            getToken: () => TOKEN,
+            getToken: async (): Promise<string> => TOKEN,
         } as Authenticator;
 
         pusher = {} as Pusher;
@@ -72,7 +72,7 @@ describe('LocationListener', () => {
         expect(locationListener.getConnectionState()).toEqual(ConnectionState.Connecting);
     });
 
-    test('connect()', () => {
+    test('connect()', async () => {
         const nextToken = 'token2';
 
         pusher.connect = jest.fn().mockImplementation();
@@ -80,9 +80,9 @@ describe('LocationListener', () => {
 
         const locationListener = new LocationListener(authenticator);
 
-        authenticator.getToken = (): string => nextToken;
+        authenticator.getToken = async (): Promise<string> => nextToken;
 
-        locationListener.connect();
+        await locationListener.connect();
 
         expect(pusher.connect).toBeCalledTimes(1);
         expect(pusher.config.auth).toMatchObject({
@@ -92,12 +92,12 @@ describe('LocationListener', () => {
         });
     });
 
-    test('disconnect()', () => {
+    test('disconnect()', async () => {
         pusher.disconnect = jest.fn().mockImplementation();
 
         const locationListener = new LocationListener(authenticator);
 
-        locationListener.disconnect();
+        await locationListener.disconnect();
 
         expect(pusher.disconnect).toBeCalledTimes(1);
     });
@@ -157,7 +157,7 @@ describe('LocationListener', () => {
             expect(clientListener).toHaveBeenCalledWith(expectedEvent);
         });
 
-        test('with DeviceAlarm event', () => {
+        test('with DeviceAlarm event', async () => {
             const expectedEvent = {
                 device_id: 'device1',
                 event: DeviceEventType.Alarmed,
@@ -167,7 +167,7 @@ describe('LocationListener', () => {
                 return;
             });
 
-            locationListener.addLocation(LOCATION_ID);
+            await locationListener.addLocation(LOCATION_ID);
             locationListener.on(LocationEventType.DeviceAlarm, clientListener);
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -183,7 +183,7 @@ describe('LocationListener', () => {
             expect(clientListener).toHaveBeenCalledWith(expectedEvent, LOCATION_ID);
         });
 
-        test('with DevicePair event', () => {
+        test('with DevicePair event', async () => {
             const expectedEvent = {
                 id: 'device1',
                 event: DeviceEventType.Paired,
@@ -193,7 +193,7 @@ describe('LocationListener', () => {
                 return;
             });
 
-            locationListener.addLocation(LOCATION_ID);
+            await locationListener.addLocation(LOCATION_ID);
             locationListener.on(LocationEventType.DevicePair, clientListener);
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -209,7 +209,7 @@ describe('LocationListener', () => {
             expect(clientListener).toHaveBeenCalledWith(expectedEvent, LOCATION_ID);
         });
 
-        test('with DeviceTrigger event', () => {
+        test('with DeviceTrigger event', async () => {
             const expectedEvent = {
                 id: 'device1',
                 event: DeviceEventType.Triggered,
@@ -219,7 +219,7 @@ describe('LocationListener', () => {
                 return;
             });
 
-            locationListener.addLocation(LOCATION_ID);
+            await locationListener.addLocation(LOCATION_ID);
             locationListener.on(LocationEventType.DeviceTrigger, clientListener);
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -235,7 +235,7 @@ describe('LocationListener', () => {
             expect(clientListener).toHaveBeenCalledWith(expectedEvent, LOCATION_ID);
         });
 
-        test('with Hub event', () => {
+        test('with Hub event', async () => {
             const expectedEvent = {
                 id: 'test',
             } as Hub;
@@ -244,7 +244,7 @@ describe('LocationListener', () => {
                 return;
             });
 
-            locationListener.addLocation(LOCATION_ID);
+            await locationListener.addLocation(LOCATION_ID);
             locationListener.on(LocationEventType.Hub, clientListener);
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -260,7 +260,7 @@ describe('LocationListener', () => {
             expect(clientListener).toHaveBeenCalledWith(expectedEvent, LOCATION_ID);
         });
 
-        test('with Mode event', () => {
+        test('with Mode event', async () => {
             const expectedEvent = {
                 mode_id: 'mode1',
                 event: ModeState.Armed,
@@ -270,7 +270,7 @@ describe('LocationListener', () => {
                 return;
             });
 
-            locationListener.addLocation(LOCATION_ID);
+            await locationListener.addLocation(LOCATION_ID);
             locationListener.on(LocationEventType.Mode, clientListener);
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -286,7 +286,7 @@ describe('LocationListener', () => {
             expect(clientListener).toHaveBeenCalledWith(expectedEvent, LOCATION_ID);
         });
 
-        test('with Rfid event', () => {
+        test('with Rfid event', async () => {
             const expectedEvent = {
                 token: 'rfid1',
                 event: RfidEventType.Swiped,
@@ -296,7 +296,7 @@ describe('LocationListener', () => {
                 return;
             });
 
-            locationListener.addLocation(LOCATION_ID);
+            await locationListener.addLocation(LOCATION_ID);
             locationListener.on(LocationEventType.Rfid, clientListener);
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
