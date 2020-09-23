@@ -20,7 +20,7 @@ const PAYLOAD = {
     iat: 1579278763,
     exp: 1610814763,
 } as Payload;
-const SLEEP_MILLIS = 150;
+const CACHE_TTL = 100;
 
 describe('Authenticator', () => {
     const UnauthenticatedApiMock = UnauthenticatedApi as jest.Mock<UnauthenticatedApi>;
@@ -54,10 +54,10 @@ describe('Authenticator', () => {
             },
         );
 
-        const authenticator = await new AuthenticatorFactory(new UnauthenticatedApi()).create(LOGIN_REQUEST);
+        const authenticator = new AuthenticatorFactory(CACHE_TTL, new UnauthenticatedApi()).create(LOGIN_REQUEST);
 
-        expect(authenticator.getToken()).toEqual(TOKEN);
-        expect(authenticator.getPayload()).toMatchObject(PAYLOAD);
+        await expect(authenticator.getToken()).resolves.toEqual(TOKEN);
+        await expect(authenticator.getPayload()).resolves.toMatchObject(PAYLOAD);
     });
 
     test('error on refresh', async () => {
@@ -77,17 +77,15 @@ describe('Authenticator', () => {
             },
         );
 
-        const authenticator = await new AuthenticatorFactory(new UnauthenticatedApi()).create(LOGIN_REQUEST);
+        const authenticator = new AuthenticatorFactory(CACHE_TTL, new UnauthenticatedApi()).create(LOGIN_REQUEST);
 
-        expect(authenticator.getToken()).toEqual(TOKEN);
-        expect(authenticator.getPayload()).toMatchObject(PAYLOAD);
+        await expect(authenticator.getToken()).resolves.toEqual(TOKEN);
+        await expect(authenticator.getPayload()).resolves.toMatchObject(PAYLOAD);
 
-        authenticator.refresh(SLEEP_MILLIS / 2);
+        await sleep(CACHE_TTL * 2);
 
-        await sleep(SLEEP_MILLIS);
-
-        expect(() => authenticator.getToken()).toThrowError();
-        expect(() => authenticator.getPayload()).toThrowError();
+        await expect(authenticator.getToken()).rejects.toBeInstanceOf(Error);
+        await expect(authenticator.getPayload()).rejects.toBeInstanceOf(Error);
     });
 
     test('success on refresh', async () => {
@@ -101,16 +99,14 @@ describe('Authenticator', () => {
             },
         );
 
-        const authenticator = await new AuthenticatorFactory(new UnauthenticatedApi()).create(LOGIN_REQUEST);
+        const authenticator = new AuthenticatorFactory(CACHE_TTL, new UnauthenticatedApi()).create(LOGIN_REQUEST);
 
-        expect(authenticator.getToken()).toEqual(TOKEN);
-        expect(authenticator.getPayload()).toMatchObject(PAYLOAD);
+        await expect(authenticator.getToken()).resolves.toEqual(TOKEN);
+        await expect(authenticator.getPayload()).resolves.toMatchObject(PAYLOAD);
 
-        authenticator.refresh(SLEEP_MILLIS / 2);
+        await sleep(CACHE_TTL * 2);
 
-        await sleep(SLEEP_MILLIS);
-
-        expect(authenticator.getToken()).toEqual(TOKEN);
-        expect(authenticator.getPayload()).toMatchObject(PAYLOAD);
+        await expect(authenticator.getToken()).resolves.toEqual(TOKEN);
+        await expect(authenticator.getPayload()).resolves.toMatchObject(PAYLOAD);
     });
 });
