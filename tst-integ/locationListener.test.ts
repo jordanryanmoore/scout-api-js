@@ -33,12 +33,14 @@ describe('LocationListener', () => {
                     reject(e);
                 }
             });
+
+            locationListener.connect();
         });
     });
 
     afterEach(async () => {
         if (locationListener) {
-            await locationListener.disconnect();
+            locationListener.disconnect();
         }
     });
 });
