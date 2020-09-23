@@ -11,7 +11,7 @@ test('MembersApi.findMember()', async () => {
         password,
     });
 
-    const memberId = await (authenticator.getPayload()).id;
+    const memberId = (await authenticator.getPayload()).id;
     const membersApi = new MembersApi({
         apiKey: (): Promise<string> => authenticator.getToken(),
     });
