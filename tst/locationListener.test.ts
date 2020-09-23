@@ -69,7 +69,7 @@ describe('LocationListener', () => {
 
         const locationListener = new LocationListener(authenticator);
 
-        expect(locationListener.getConnectionState()).toEqual(ConnectionState.Connecting);
+        expect(locationListener.getConnectionState()).toEqual(ConnectionState.Disconnected);
     });
 
     test('connect()', async () => {
@@ -84,6 +84,7 @@ describe('LocationListener', () => {
 
         await locationListener.connect();
 
+        expect(locationListener.getConnectionState()).toEqual(ConnectionState.Connecting);
         expect(pusher.connect).toBeCalledTimes(1);
         expect(pusher.config.auth).toMatchObject({
             headers: {
@@ -97,7 +98,8 @@ describe('LocationListener', () => {
 
         const locationListener = new LocationListener(authenticator);
 
-        await locationListener.disconnect();
+        await locationListener.connect();
+        locationListener.disconnect();
 
         expect(pusher.disconnect).toBeCalledTimes(1);
     });
@@ -167,7 +169,8 @@ describe('LocationListener', () => {
                 return;
             });
 
-            await locationListener.addLocation(LOCATION_ID);
+            await locationListener.connect();
+            locationListener.addLocation(LOCATION_ID);
             locationListener.on(LocationEventType.DeviceAlarm, clientListener);
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -193,7 +196,8 @@ describe('LocationListener', () => {
                 return;
             });
 
-            await locationListener.addLocation(LOCATION_ID);
+            await locationListener.connect();
+            locationListener.addLocation(LOCATION_ID);
             locationListener.on(LocationEventType.DevicePair, clientListener);
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -219,7 +223,8 @@ describe('LocationListener', () => {
                 return;
             });
 
-            await locationListener.addLocation(LOCATION_ID);
+            await locationListener.connect();
+            locationListener.addLocation(LOCATION_ID);
             locationListener.on(LocationEventType.DeviceTrigger, clientListener);
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -244,7 +249,8 @@ describe('LocationListener', () => {
                 return;
             });
 
-            await locationListener.addLocation(LOCATION_ID);
+            await locationListener.connect();
+            locationListener.addLocation(LOCATION_ID);
             locationListener.on(LocationEventType.Hub, clientListener);
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -270,7 +276,8 @@ describe('LocationListener', () => {
                 return;
             });
 
-            await locationListener.addLocation(LOCATION_ID);
+            await locationListener.connect();
+            locationListener.addLocation(LOCATION_ID);
             locationListener.on(LocationEventType.Mode, clientListener);
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -296,7 +303,8 @@ describe('LocationListener', () => {
                 return;
             });
 
-            await locationListener.addLocation(LOCATION_ID);
+            await locationListener.connect();
+            locationListener.addLocation(LOCATION_ID);
             locationListener.on(LocationEventType.Rfid, clientListener);
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
