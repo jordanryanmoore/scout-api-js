@@ -35,7 +35,7 @@ export class AuthenticatorFactory {
 
                 setTimeout((): void => {
                     token = undefined;
-                }, cacheTtl);
+                }, this.cacheTtl);
             }
 
             return token;
