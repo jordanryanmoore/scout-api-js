@@ -28,7 +28,7 @@ export class AuthenticatorFactory {
         const api = this.api;
         const getToken = async (): Promise<string> => {
             if (!token) {
-                token = await api.login(request).data.jwt;
+                token = (await api.login(request)).data.jwt;
 
                 setTimeout((): void => {
                     token = undefined;
