@@ -7,11 +7,11 @@ describe('LocationListener', () => {
     let authenticator: Authenticator;
     let locationListener: LocationListener;
 
-    beforeAll(async () => {
+    beforeAll(() => {
         const email = process.env.SCOUT_EMAIL as string;
         const password = process.env.SCOUT_PASSWORD as string;
 
-        authenticator = await new AuthenticatorFactory().create({
+        authenticator = new AuthenticatorFactory().create({
             email,
             password,
         });
@@ -36,9 +36,9 @@ describe('LocationListener', () => {
         });
     });
 
-    afterEach(() => {
+    afterEach(async () => {
         if (locationListener) {
-            locationListener.disconnect();
+            await locationListener.disconnect();
         }
     });
 });
