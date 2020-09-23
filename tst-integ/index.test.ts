@@ -6,14 +6,14 @@ configDotEnv();
 test('MembersApi.findMember()', async () => {
     const email = process.env.SCOUT_EMAIL as string;
     const password = process.env.SCOUT_PASSWORD as string;
-    const authenticator = new AuthenticatorFactory().create({
+    const authenticator = await new AuthenticatorFactory().create({
         email,
         password,
     });
 
-    const memberId = (await authenticator.getPayload()).id;
+    const memberId = authenticator.getPayload().id;
     const membersApi = new MembersApi({
-        apiKey: (): Promise<string> => authenticator.getToken(),
+        apiKey: (): string => authenticator.getToken(),
     });
 
     expect((await membersApi.findMember(email)).data.member_id).toEqual(memberId);
