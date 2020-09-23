@@ -54,7 +54,7 @@ describe('Authenticator', () => {
             },
         );
 
-        const authenticator = new AuthenticatorFactory(new UnauthenticatedApi()).create(LOGIN_REQUEST);
+        const authenticator = new AuthenticatorFactory(CACHE_TTL, new UnauthenticatedApi()).create(LOGIN_REQUEST);
 
         await expect(authenticator.getToken()).resolves.toEqual(TOKEN);
         await expect(authenticator.getPayload()).resolves.toMatchObject(PAYLOAD);
@@ -77,7 +77,7 @@ describe('Authenticator', () => {
             },
         );
 
-        const authenticator = new AuthenticatorFactory(new UnauthenticatedApi()).create(LOGIN_REQUEST, CACHE_TTL);
+        const authenticator = new AuthenticatorFactory(CACHE_TTL, new UnauthenticatedApi()).create(LOGIN_REQUEST);
 
         await expect(authenticator.getToken()).resolves.toEqual(TOKEN);
         await expect(authenticator.getPayload()).resolves.toMatchObject(PAYLOAD);
@@ -99,7 +99,7 @@ describe('Authenticator', () => {
             },
         );
 
-        const authenticator = new AuthenticatorFactory(new UnauthenticatedApi()).create(LOGIN_REQUEST, CACHE_TTL);
+        const authenticator = new AuthenticatorFactory(CACHE_TTL, new UnauthenticatedApi()).create(LOGIN_REQUEST);
 
         await expect(authenticator.getToken()).resolves.toEqual(TOKEN);
         await expect(authenticator.getPayload()).resolves.toMatchObject(PAYLOAD);
