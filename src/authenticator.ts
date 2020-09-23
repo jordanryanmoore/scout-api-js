@@ -22,7 +22,7 @@ export class AuthenticatorFactory {
     // eslint-disable-next-line no-useless-constructor
     public constructor(
         private readonly cacheTtl: number = AuthenticatorFactory.DEFAULT_CACHE_TTL,
-        private readonly api: UnauthenticatedApi = new UnauthenticatedApi()
+        private readonly api: UnauthenticatedApi = new UnauthenticatedApi(),
     ) {}
 
     public create(request: MemberCredentials): Authenticator {
