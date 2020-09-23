@@ -64,7 +64,7 @@ describe('LocationListener', () => {
         });
     });
 
-    test('getConnectionState()', () => {
+    test('getConnectionState()', async () => {
         pusher.connection.state = ConnectionState.Connecting;
 
         const locationListener = new LocationListener(authenticator);
