@@ -65,14 +65,14 @@ describe('LocationListener', () => {
     });
 
     test('getConnectionState()', async () => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        const connectionListener = (pusher.connection.bind as jest.Mock<PusherTypes.ConnectionManager>).mock.calls[0][1] as (event: any) => void;
-
         const locationListener = new LocationListener(authenticator);
 
         expect(locationListener.getConnectionState()).toEqual(ConnectionState.Disconnected);
 
         await locationListener.connect();
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        const connectionListener = (pusher.connection.bind as jest.Mock<PusherTypes.ConnectionManager>).mock.calls[0][1] as (event: any) => void;
 
         connectionListener({
             previous: ConnectionState.Disconnected,
@@ -90,6 +90,7 @@ describe('LocationListener', () => {
         await locationListener.connect();
 
         const nextToken = 'token2';
+        authenticator.getToken = (): Promise<string> => Promise.resolve(nextToken);
         (pusher.config as unknown) = {};
 
         await locationListener.connect();
@@ -144,7 +145,7 @@ describe('LocationListener', () => {
             });
         });
 
-        test('with ConnectionState event', () => {
+        test('with ConnectionState event', async () => {
             const expectedEvent: ConnectionStateEvent = {
                 previous: ConnectionState.Connecting,
                 current: ConnectionState.Connected,
@@ -153,6 +154,8 @@ describe('LocationListener', () => {
             const clientListener = jest.fn().mockImplementationOnce(() => {
                 return;
             });
+
+            await locationListener.connect();
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             const connectionListener = (pusher.connection.bind as jest.Mock<PusherTypes.ConnectionManager>).mock.calls[0][1] as (event: any) => void;
