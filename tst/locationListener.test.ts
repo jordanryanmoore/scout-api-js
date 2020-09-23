@@ -65,13 +65,19 @@ describe('LocationListener', () => {
     });
 
     test('getConnectionState()', async () => {
-        pusher.connection.state = ConnectionState.Connecting;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        const connectionListener = (pusher.connection.bind as jest.Mock<PusherTypes.ConnectionManager>).mock.calls[0][1] as (event: any) => void;
 
         const locationListener = new LocationListener(authenticator);
 
         expect(locationListener.getConnectionState()).toEqual(ConnectionState.Disconnected);
 
         await locationListener.connect();
+
+        connectionListener({
+            previous: ConnectionState.Disconnected,
+            current: ConnectionState.Connecting,
+        });
 
         expect(locationListener.getConnectionState()).toEqual(ConnectionState.Connecting);
     });
@@ -82,12 +88,6 @@ describe('LocationListener', () => {
         const locationListener = new LocationListener(authenticator);
 
         await locationListener.connect();
-
-        expect(pusher.config.auth).toMatchObject({
-            headers: {
-                Authorization: TOKEN,
-            },
-        });
 
         const nextToken = 'token2';
         (pusher.config as unknown) = {};
