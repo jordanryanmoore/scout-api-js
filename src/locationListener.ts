@@ -123,7 +123,7 @@ export class LocationListener {
             auth: await this.getAuthConfig(),
         });
 
-        this.pusher.connection.bind(CONNECTION_STATE_EVENT, (event: ConnectionStateEvent) => this.emitConnectionStateEvent(event));
+        pusher.connection.bind(CONNECTION_STATE_EVENT, (event: ConnectionStateEvent) => this.emitConnectionStateEvent(event));
 
         return pusher;
     }
