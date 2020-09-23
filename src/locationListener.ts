@@ -52,18 +52,18 @@ export class LocationListener {
     private connectionState: ConnectionState = ConnectionState.Disconnected;
     private pusher?: Pusher;
 
-    public constructor(private readonly authenticator: Authenticator) {
-    }
+    // eslint-disable-next-line no-useless-constructor
+    public constructor(private readonly authenticator: Authenticator) {}
 
     public getConnectionState(): ConnectionState {
         return this.connectionState;
     }
 
     public async connect(): Promise<void> {
-        let auth = await this.getAuthConfig();
+        const auth = await this.getAuthConfig();
 
         if (this.pusher) {
-            this.config.auth = auth;
+            this.pusher.config.auth = auth;
             this.pusher.connect();
         } else {
             this.pusher = new Pusher(API_KEY, {
