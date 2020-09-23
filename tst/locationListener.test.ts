@@ -70,21 +70,30 @@ describe('LocationListener', () => {
         const locationListener = new LocationListener(authenticator);
 
         expect(locationListener.getConnectionState()).toEqual(ConnectionState.Disconnected);
-    });
-
-    test('connect()', async () => {
-        const nextToken = 'token2';
-
-        pusher.connect = jest.fn().mockImplementation();
-        (pusher.config as unknown) = {};
-
-        const locationListener = new LocationListener(authenticator);
-
-        authenticator.getToken = (): Promise<string> => Promise.resolve(nextToken);
 
         await locationListener.connect();
 
         expect(locationListener.getConnectionState()).toEqual(ConnectionState.Connecting);
+    });
+
+    test('connect()', async () => {
+        pusher.connect = jest.fn().mockImplementation();
+
+        const locationListener = new LocationListener(authenticator);
+
+        await locationListener.connect();
+
+        expect(pusher.config.auth).toMatchObject({
+            headers: {
+                Authorization: TOKEN,
+            },
+        });
+
+        const nextToken = 'token2';
+        (pusher.config as unknown) = {};
+
+        await locationListener.connect();
+
         expect(pusher.connect).toBeCalledTimes(1);
         expect(pusher.config.auth).toMatchObject({
             headers: {
@@ -97,6 +106,10 @@ describe('LocationListener', () => {
         pusher.disconnect = jest.fn().mockImplementation();
 
         const locationListener = new LocationListener(authenticator);
+
+        locationListener.disconnect();
+
+        expect(pusher.disconnect).toBeCalledTimes(0);
 
         await locationListener.connect();
         locationListener.disconnect();
