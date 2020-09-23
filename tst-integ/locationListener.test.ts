@@ -22,7 +22,7 @@ describe('LocationListener', () => {
     });
 
     test('on(ConnectionState)', async () => {
-        const result = return new Promise((resolve, reject) => {
+        const result = new Promise((resolve, reject) => {
             locationListener.on(LocationEventType.ConnectionState, event => {
                 try {
                     expect(event.previous).toEqual(ConnectionState.Connecting);
