@@ -20,9 +20,12 @@ export class AuthenticatorFactory {
     private static readonly DEFAULT_CACHE_TTL = 24 * 60 * 60 * 1000; // 1 day
 
     // eslint-disable-next-line no-useless-constructor
-    public constructor(private readonly api: UnauthenticatedApi = new UnauthenticatedApi()) {}
+    public constructor(
+        private readonly cacheTtl: number = AuthenticatorFactory.DEFAULT_CACHE_TTL,
+        private readonly api: UnauthenticatedApi = new UnauthenticatedApi()
+    ) {}
 
-    public create(request: MemberCredentials, cacheTtl = AuthenticatorFactory.DEFAULT_CACHE_TTL): Authenticator {
+    public create(request: MemberCredentials): Authenticator {
         let token: string | undefined;
 
         const api = this.api;
