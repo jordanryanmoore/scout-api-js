@@ -40,7 +40,7 @@ describe('LocationListener', () => {
         return result;
     });
 
-    afterEach(async () => {
+    afterEach(() => {
         if (locationListener) {
             locationListener.disconnect();
         }
