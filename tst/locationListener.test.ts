@@ -31,7 +31,7 @@ describe('LocationListener', () => {
 
     beforeEach(() => {
         authenticator = {
-            getToken: async (): Promise<string> => TOKEN,
+            getToken: (): Promise<string> => Promise.resolve(TOKEN),
         } as Authenticator;
 
         pusher = {} as Pusher;
@@ -80,7 +80,7 @@ describe('LocationListener', () => {
 
         const locationListener = new LocationListener(authenticator);
 
-        authenticator.getToken = async (): Promise<string> => nextToken;
+        authenticator.getToken = (): Promise<string> => Promise.resolve(nextToken);
 
         await locationListener.connect();
 
