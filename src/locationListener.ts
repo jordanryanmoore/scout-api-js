@@ -49,11 +49,10 @@ export interface ConnectionStateEvent {
 
 export class LocationListener {
     private readonly eventEmitter = new EventEmitter();
-    private readonly pusher: Promise<Pusher>;
-    private connectionState: ConnectionState = ConnectionState.Unavailable;
+    private connectionState: ConnectionState = ConnectionState.Disconnected;
+    private pusher?: Pusher;
 
     public constructor(private readonly authenticator: Authenticator) {
-        this.pusher = this.getPusher();
     }
 
     public getConnectionState(): ConnectionState {
@@ -61,22 +60,35 @@ export class LocationListener {
     }
 
     public async connect(): Promise<void> {
-        const pusher = await this.pusher;
-        pusher.config.auth = await this.getAuthConfig();
-        pusher.connect();
+        let auth = await this.getAuthConfig();
+
+        if (this.pusher) {
+            this.config.auth = auth;
+            this.pusher.connect();
+        } else {
+            this.pusher = new Pusher(API_KEY, {
+                authEndpoint: AUTH_ENDPOINT,
+                auth,
+            });
+
+            this.pusher.connection.bind(CONNECTION_STATE_EVENT, (event: ConnectionStateEvent) => this.emitConnectionStateEvent(event));
+        }
     }
 
-    public async disconnect(): Promise<void> {
-        (await this.pusher).disconnect();
+    public disconnect(): void {
+        this.pusher?.disconnect();
     }
 
-    public async addLocation(locationId: string): Promise<void> {
-        const pusher = await this.pusher;
+    public addLocation(locationId: string): void {
+        if (!this.pusher) {
+            throw new Error('The listener is not connected, likely due to a missing call to connect().');
+        }
+
         const channelName = `private-${locationId}`;
-        let channel = pusher.channel(channelName);
+        let channel = this.pusher.channel(channelName);
 
         if (!channel) {
-            channel = pusher.subscribe(channelName);
+            channel = this.pusher.subscribe(channelName);
         }
 
         channel.bind(ScoutEventType.Device, (event: DeviceEvent) => this.emitDeviceEvent(event, locationId));
@@ -85,13 +97,16 @@ export class LocationListener {
         channel.bind(ScoutEventType.Rfid, (event: RfidEvent) => this.emit(LocationEventType.Rfid, event, locationId));
     }
 
-    public async removeLocation(locationId: string): Promise<void> {
-        const pusher = await this.pusher;
+    public removeLocation(locationId: string): void {
+        if (!this.pusher) {
+            throw new Error('The listener is not connected, likely due to a missing call to connect().');
+        }
+
         const channelName = `private-${locationId}`;
-        const channel = pusher.channel(channelName);
+        const channel = this.pusher.channel(channelName);
 
         if (channel) {
-            pusher.unsubscribe(channelName);
+            this.pusher.unsubscribe(channelName);
         }
     }
 
@@ -115,17 +130,6 @@ export class LocationListener {
     public off(eventType: LocationEventType.Rfid, listener: LocationEventListener<RfidEvent>): void;
     public off(eventType: string, listener: LocationEventListener<any>): void {
         this.eventEmitter.off(eventType, listener);
-    }
-
-    private async getPusher(): Promise<Pusher> {
-        const pusher = new Pusher(API_KEY, {
-            authEndpoint: AUTH_ENDPOINT,
-            auth: await this.getAuthConfig(),
-        });
-
-        pusher.connection.bind(CONNECTION_STATE_EVENT, (event: ConnectionStateEvent) => this.emitConnectionStateEvent(event));
-
-        return pusher;
     }
 
     private async getAuthConfig(): Promise<PusherTypes.AuthOptions> {
