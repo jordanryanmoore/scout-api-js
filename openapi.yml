@@ -237,6 +237,20 @@ components:
         token:
           type: boolean
 
+    AuthenticatedMember:
+      required:
+        - id
+        - fname
+        - email
+      properties:
+        id:
+          type: string
+        fname:
+          type: string
+        email:
+          type: string
+          format: email
+
     BillingInfo:
       required:
         - card
@@ -1950,6 +1964,13 @@ components:
             items:
               $ref: '#/components/schemas/AlarmContacts'
 
+    AuthenticatedMember:
+      description: The authenticated member's basic information.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthenticatedMember'
+
     BillingInfo:
       description: The location's billing information.
       content:
@@ -2182,6 +2203,18 @@ components:
 
 paths:
   /auth:
+    get:
+      tags:
+        - authentication
+        - authenticated
+      operationId: getMember
+      summary: Gets the member's basic information.
+      responses:
+        default:
+          $ref: '#/components/responses/StatusError'
+        200:
+          $ref: '#/components/responses/AuthenticatedMember'
+
     post:
       tags:
         - authentication
