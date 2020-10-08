@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "pregenerate": "rm -rf generated-src/**",
-    "generate": "openapi-generator generate -i openapi.yml -g typescript-axios -o generated-src/ -c openapi.config.yml",
+    "generate": "openapi-generator-cli generate -i openapi.yml -g typescript-axios -o generated-src/ -c openapi.config.yml",
     "test": "jest",
     "test-integ": "jest -c jest-integ.config.js",
     "precompile": "rm -rf lib/**",
@@ -30,7 +30,7 @@
   },
   "homepage": "https://github.com/jordanryanmoore/scout-api-js#readme",
   "devDependencies": {
-    "@openapitools/openapi-generator-cli": "^1.0.18-5.0.0-beta2",
+    "@openapitools/openapi-generator-cli": "^2.0.3",
     "@types/jest": "^26.0.3",
     "@types/jsonwebtoken": "^8.3.8",
     "@typescript-eslint/eslint-plugin": "^4.0.0",
