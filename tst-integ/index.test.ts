@@ -1,5 +1,5 @@
 import { config as configDotEnv } from 'dotenv';
-import { AuthenticatorFactory, MembersApi } from '../src';
+import { AuthenticatorFactory, MembersApi, Configuration } from '../src';
 
 configDotEnv();
 
@@ -12,9 +12,11 @@ test('MembersApi.findMember()', async () => {
     });
 
     const memberId = (await authenticator.getPayload()).id;
-    const membersApi = new MembersApi({
-        apiKey: (): Promise<string> => authenticator.getToken(),
-    });
+    const membersApi = new MembersApi(
+        new Configuration({
+            apiKey: (): Promise<string> => authenticator.getToken(),
+        }),
+    );
 
     expect((await membersApi.findMember(email)).data.member_id).toEqual(memberId);
 });
