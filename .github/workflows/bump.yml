@@ -23,5 +23,9 @@ jobs:
         run: npm version ${{github.event.inputs.version}}
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
-      - name: Push
-        run: git push --follow-tags
+      - name: Push changes and tag
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{secrets.GITHUB_TOKEN}}
+          branch: ${{ github.ref }}
+          tags: true
