@@ -20,7 +20,7 @@ jobs:
           node-version: 14
           registry-url: https://registry.npmjs.org/
       - name: Bump version
-        run: npm version ${{version}}
+        run: npm version ${{github.event.inputs.version}}
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
       - name: Push
