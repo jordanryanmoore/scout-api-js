@@ -19,13 +19,13 @@ jobs:
         with:
           node-version: 14
           registry-url: https://registry.npmjs.org/
+      - name: Config author
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
       - name: Bump version
         run: npm version ${{github.event.inputs.version}}
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
       - name: Push changes and tag
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{secrets.GITHUB_TOKEN}}
-          branch: ${{ github.ref }}
-          tags: true
+        run: git push --follow-tags
