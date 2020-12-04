@@ -4,10 +4,10 @@ info:
   title: Scout API
   description: This is an unofficial API spec for Scout.
   contact:
-    url: http://github.com/jordanryanmoore/scout-api
+    url: http://github.com/BewhiskeredBard/scout-api
   license:
     name: MIT
-    url: http://github.com/jordanryanmoore/scout-api/LICENSE.md
+    url: http://github.com/BewhiskeredBard/scout-api/LICENSE.md
   version: 0.0.0
 
 servers:
