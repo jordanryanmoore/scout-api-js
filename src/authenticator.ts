@@ -1,11 +1,6 @@
 import { decode } from 'jsonwebtoken';
 import { UnauthenticatedApi, MemberCredentials } from '../generated-src';
 
-export interface Authenticator {
-    getToken(): Promise<string>;
-    getPayload(): Promise<Payload>;
-}
-
 export interface Payload {
     id: string;
     fname: string;
@@ -13,6 +8,11 @@ export interface Payload {
     token: string;
     iat: number;
     exp: number;
+}
+
+export interface Authenticator {
+    getToken(): Promise<string>;
+    getPayload(): Promise<Payload>;
 }
 
 export class AuthenticatorFactory {

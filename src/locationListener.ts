@@ -28,7 +28,7 @@ export enum LocationEventType {
     DeviceAlarm = 'device_alarm',
     DevicePair = 'device_pair',
     DeviceTrigger = 'device_trigger',
-    // eslint-disable-next-line no-shadow
+    // eslint-disable-next-line @typescript-eslint/no-shadow
     Hub = 'hub',
     Mode = 'mode',
     Rfid = 'rfid',
