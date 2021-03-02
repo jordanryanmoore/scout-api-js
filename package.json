@@ -21,14 +21,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/BewhiskeredBard/scout-api-js.git"
+    "url": "git+https://github.com/BewhiskeredBard/scout-api.git"
   },
   "author": "Bewhiskered Bard",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/BewhiskeredBard/scout-api-js/issues"
+    "url": "https://github.com/BewhiskeredBard/scout-api/issues"
   },
-  "homepage": "https://github.com/BewhiskeredBard/scout-api-js#readme",
+  "homepage": "https://github.com/BewhiskeredBard/scout-api#readme",
   "devDependencies": {
     "@openapitools/openapi-generator-cli": "^2.0.3",
     "@types/jest": "^26.0.3",
