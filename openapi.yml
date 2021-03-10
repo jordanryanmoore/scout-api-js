@@ -538,6 +538,7 @@ components:
         - door_panel
         - door_lock
         - glass_break
+        - key_pad
         - light_bulb
         - motion_sensor
         - outlet
