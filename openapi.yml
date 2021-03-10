@@ -321,7 +321,6 @@ components:
         - hub_id
         - id
         - location_id
-        - mode_ids
         - name
         - type
       properties:
@@ -343,6 +342,12 @@ components:
               properties:
                 hub:
                   type: boolean
+            modes:
+              properties:
+                sleep: 
+                  type: string
+                away: 
+                  type: string
         heartbeat:
           type: integer
           readOnly: true
