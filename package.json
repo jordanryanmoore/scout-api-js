@@ -1,6 +1,6 @@
 {
   "name": "scout-api",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "description": "An unofficial JavaScript library for the Scout security system API.",
   "main": "lib/src/index.js",
   "types": "lib/src/index.d.ts",
