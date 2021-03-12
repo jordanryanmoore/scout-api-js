@@ -397,6 +397,8 @@ components:
         at:
           type: string
           format: date-time
+        level:
+          type: number
         low:
           type: string
           format: date-time
