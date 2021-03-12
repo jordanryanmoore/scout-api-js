@@ -527,6 +527,7 @@ components:
             - $ref: '#/components/schemas/AccessSensorState'
             - $ref: '#/components/schemas/DoorPanelState'
             - $ref: '#/components/schemas/GlassBreakState'
+            - $ref: '#/components/schemas/KeyPadState'
             - $ref: '#/components/schemas/MotionSensorState'
             - $ref: '#/components/schemas/SmokeAlarmState'
             - $ref: '#/components/schemas/WaterSensorState'
@@ -944,6 +945,13 @@ components:
       properties:
         valid:
           type: boolean
+
+    KeyPadState:
+      type: string
+      enum:
+        - away
+        - disarmed
+        - sleep
 
     Location:
       required:
