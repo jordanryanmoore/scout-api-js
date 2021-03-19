@@ -21,6 +21,8 @@ jobs:
       run: npm ci
       env:
         CI: true
+    - name: Unit Tests
+      run: npm test
     - name: Code Coverage
       uses: codecov/codecov-action@v1
       with:
