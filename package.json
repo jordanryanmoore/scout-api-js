@@ -16,8 +16,8 @@
     "compile": "tsc",
     "build": "run-s generate lint compile",
     "lint": "eslint . --ext .ts",
-    "prepare": "run-s build test",
-    "prepublishOnly": "run-s test-integ"
+    "prepare": "run-s build",
+    "prepublishOnly": "run-s test test-integ"
   },
   "repository": {
     "type": "git",
