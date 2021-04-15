@@ -478,7 +478,9 @@ components:
         channel:
           type: integer
         fw_version:
-          type: integer
+          oneOf:
+            - type: integer
+            - type: string
         humidity:
           $ref: '#/components/schemas/DeviceHumidityReport'
         manufacturer:
