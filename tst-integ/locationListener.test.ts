@@ -11,6 +11,9 @@ describe('LocationListener', () => {
         const email = process.env.SCOUT_EMAIL as string;
         const password = process.env.SCOUT_PASSWORD as string;
 
+        expect(email).not.toBeUndefined();
+        expect(password).not.toBeUndefined();
+
         authenticator = new AuthenticatorFactory().create({
             email,
             password,
