@@ -14,6 +14,8 @@ describe('LocationListener', () => {
         expect(email).not.toBeUndefined();
         expect(password).not.toBeUndefined();
 
+        console.log(`Authenticating with ${email}.`);
+
         authenticator = new AuthenticatorFactory().create({
             email,
             password,
