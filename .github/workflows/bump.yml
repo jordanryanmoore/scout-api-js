@@ -19,10 +19,6 @@ jobs:
         with:
           node-version: 14
           registry-url: https://registry.npmjs.org/
-      - name: Config author
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
       - name: Bump version
         run: npm version ${{github.event.inputs.version}}
         env:
