@@ -44,15 +44,13 @@ describe('Authenticator', () => {
     });
 
     test('single use', async () => {
-        mockAuthApi(
-            async (): Promise<AxiosResponse<Session>> => {
-                return Promise.resolve({
-                    data: {
-                        jwt: TOKEN,
-                    },
-                } as AxiosResponse);
-            },
-        );
+        mockAuthApi(async (): Promise<AxiosResponse<Session>> => {
+            return Promise.resolve({
+                data: {
+                    jwt: TOKEN,
+                },
+            } as AxiosResponse);
+        });
 
         const authenticator = new AuthenticatorFactory(CACHE_TTL, new UnauthenticatedApi()).create(LOGIN_REQUEST);
 
@@ -63,19 +61,17 @@ describe('Authenticator', () => {
     test('error on refresh', async () => {
         let logins = 0;
 
-        mockAuthApi(
-            async (): Promise<AxiosResponse<Session>> => {
-                if (1 < ++logins) {
-                    throw new Error('testing');
-                }
+        mockAuthApi(async (): Promise<AxiosResponse<Session>> => {
+            if (1 < ++logins) {
+                throw new Error('testing');
+            }
 
-                return Promise.resolve({
-                    data: {
-                        jwt: TOKEN,
-                    },
-                } as AxiosResponse);
-            },
-        );
+            return Promise.resolve({
+                data: {
+                    jwt: TOKEN,
+                },
+            } as AxiosResponse);
+        });
 
         const authenticator = new AuthenticatorFactory(CACHE_TTL, new UnauthenticatedApi()).create(LOGIN_REQUEST);
 
@@ -89,15 +85,13 @@ describe('Authenticator', () => {
     });
 
     test('success on refresh', async () => {
-        mockAuthApi(
-            async (): Promise<AxiosResponse<Session>> => {
-                return Promise.resolve({
-                    data: {
-                        jwt: TOKEN,
-                    },
-                } as AxiosResponse);
-            },
-        );
+        mockAuthApi(async (): Promise<AxiosResponse<Session>> => {
+            return Promise.resolve({
+                data: {
+                    jwt: TOKEN,
+                },
+            } as AxiosResponse);
+        });
 
         const authenticator = new AuthenticatorFactory(CACHE_TTL, new UnauthenticatedApi()).create(LOGIN_REQUEST);
 

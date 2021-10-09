@@ -25,7 +25,7 @@ const CHANNEL_NAME = `private-${LOCATION_ID}`;
 jest.mock('pusher-js');
 
 describe('LocationListener', () => {
-    const MockPusher = (Pusher as unknown) as jest.Mock;
+    const MockPusher = Pusher as unknown as jest.Mock;
     let authenticator: Authenticator;
     let pusher: Pusher;
 
@@ -38,17 +38,13 @@ describe('LocationListener', () => {
 
         pusher.connection = {} as PusherTypes.ConnectionManager;
 
-        pusher.connection.bind = jest.fn().mockImplementation(
-            (): PusherTypes.ConnectionManager => {
-                return pusher.connection;
-            },
-        );
+        pusher.connection.bind = jest.fn().mockImplementation((): PusherTypes.ConnectionManager => {
+            return pusher.connection;
+        });
 
-        pusher.bind = jest.fn().mockImplementation(
-            (): Pusher => {
-                return pusher;
-            },
-        );
+        pusher.bind = jest.fn().mockImplementation((): Pusher => {
+            return pusher;
+        });
 
         MockPusher.mockClear();
         MockPusher.mockImplementationOnce((apiKey: string, config: PusherTypes.Options) => {
@@ -132,13 +128,11 @@ describe('LocationListener', () => {
                 return undefined;
             });
 
-            pusher.subscribe = jest.fn().mockImplementationOnce(
-                (name: string): PusherTypes.Channel => {
-                    expect(name).toEqual(CHANNEL_NAME);
+            pusher.subscribe = jest.fn().mockImplementationOnce((name: string): PusherTypes.Channel => {
+                expect(name).toEqual(CHANNEL_NAME);
 
-                    return channel;
-                },
-            );
+                return channel;
+            });
 
             channel.bind = jest.fn().mockImplementation(() => {
                 return channel;
