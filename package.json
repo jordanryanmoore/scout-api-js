@@ -11,7 +11,7 @@
     "pregenerate": "rm -rf generated-src/**",
     "generate": "openapi-generator-cli generate -i openapi.yml -g typescript-axios -o generated-src/ -c openapi.config.yml",
     "test": "jest",
-    "test-integ": "jest -c jest-integ.config.js",
+    "test-integ": "jest -c jest-integ.config.js --forceExit",
     "precompile": "rm -rf lib/**",
     "compile": "tsc",
     "build": "run-s generate lint compile",
