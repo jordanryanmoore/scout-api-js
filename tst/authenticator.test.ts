@@ -49,7 +49,7 @@ describe('Authenticator', () => {
                 data: {
                     jwt: TOKEN,
                 },
-            } as AxiosResponse);
+            } as AxiosResponse) as AxiosPromise<Session>;
         });
 
         const authenticator = new AuthenticatorFactory(CACHE_TTL, new UnauthenticatedApi()).create(LOGIN_REQUEST);
@@ -70,7 +70,7 @@ describe('Authenticator', () => {
                 data: {
                     jwt: TOKEN,
                 },
-            } as AxiosResponse);
+            } as AxiosResponse) as AxiosPromise<Session>;
         });
 
         const authenticator = new AuthenticatorFactory(CACHE_TTL, new UnauthenticatedApi()).create(LOGIN_REQUEST);
@@ -90,7 +90,7 @@ describe('Authenticator', () => {
                 data: {
                     jwt: TOKEN,
                 },
-            } as AxiosResponse);
+            } as AxiosResponse) as AxiosPromise<Session>;
         });
 
         const authenticator = new AuthenticatorFactory(CACHE_TTL, new UnauthenticatedApi()).create(LOGIN_REQUEST);
