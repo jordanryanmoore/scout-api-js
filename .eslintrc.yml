@@ -23,6 +23,8 @@ rules:
         - error
     '@typescript-eslint/member-ordering':
         - error
+    '@typescript-eslint/no-explicit-any':
+        - warn
     '@typescript-eslint/no-floating-promises':
         - error
     '@typescript-eslint/no-shadow':
